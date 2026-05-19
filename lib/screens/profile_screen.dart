@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../theme/app_theme.dart';
 import 'report_center_screen.dart';
+import 'student_directory_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -82,6 +83,13 @@ class ProfileScreen extends StatelessWidget {
           Icons.file_copy_outlined, 
           AppTheme.primaryColor,
           () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ReportCenterScreen())),
+        ),
+        _buildMenuCard(
+          'Student Directory', 
+          'View and manage student records', 
+          Icons.people_outline, 
+          Colors.indigo,
+          () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentDirectoryScreen())),
         ),
       ],
     );

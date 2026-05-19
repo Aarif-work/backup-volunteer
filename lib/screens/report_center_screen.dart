@@ -30,6 +30,7 @@ class ReportCenterScreen extends StatelessWidget {
             _buildReportCategory('Activity Reports'),
             const SizedBox(height: 12),
             _buildReportCard('Mission Log Summary', 'Volunteer hours and activities', Icons.history, Colors.purple),
+            _buildReportCard('Student Request Summary', 'Trends in leave and fee assistance', Icons.assessment_outlined, Colors.orange),
             
             const SizedBox(height: 48),
             _buildInfoBox(),
