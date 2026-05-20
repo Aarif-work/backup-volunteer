@@ -4,6 +4,7 @@ import 'expense_center.dart';
 import 'profile_screen.dart';
 import 'notification_screen.dart';
 import '../theme/app_theme.dart';
+import '../models/app_models.dart';
 
 class MainNavigationContainer extends StatefulWidget {
   const MainNavigationContainer({super.key});
@@ -26,83 +27,96 @@ class _MainNavigationContainerState extends State<MainNavigationContainer> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Stack(
-        children: [
-          IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: _buildPremiumNavBar(),
-          ),
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
       ),
+      bottomNavigationBar: _buildPremiumNavBar(),
     );
   }
 
   Widget _buildPremiumNavBar() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       height: 85,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryColor.withOpacity(0.12),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(0, Icons.grid_view_rounded, 'Home'),
-          _buildNavItem(1, Icons.pending_actions_rounded, 'Requests'),
-          _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Finance'),
-          _buildNavItem(3, Icons.person_rounded, 'Profile'),
-        ],
+      child: ValueListenableBuilder<int>(
+        valueListenable: globalPendingRequestsCount,
+        builder: (context, count, child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.grid_view_rounded, 'Home', 0),
+              _buildNavItem(1, Icons.pending_actions_rounded, 'Requests', count),
+              _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Finance', 0),
+              _buildNavItem(3, Icons.person_rounded, 'Profile', 0),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
+  Widget _buildNavItem(int index, IconData icon, String label, int badgeCount) {
     bool isSelected = _currentIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOutBack,
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: isSelected 
-          ? BoxDecoration(
-              color: AppTheme.primaryLight,
-              borderRadius: BorderRadius.circular(22),
-            ) 
-          : null,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon, 
-              color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary.withOpacity(0.7),
-              size: 24,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  icon, 
+                  color: isSelected ? Colors.black : Colors.grey[300],
+                  size: 26,
+                ),
+                if (badgeCount > 0)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        badgeCount.toString(),
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            if (isSelected) ...[
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: AppTheme.primaryColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+            if (isSelected) 
+              Container(
+                margin: const EdgeInsets.only(top: 6),
+                width: 4,
+                height: 4,
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
                 ),
               ),
-            ],
           ],
         ),
       ),

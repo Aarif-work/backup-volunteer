@@ -2,75 +2,125 @@ import 'package:flutter/material.dart';
 import '../models/app_models.dart';
 import '../theme/app_theme.dart';
 
-class StudentDirectoryScreen extends StatelessWidget {
+class StudentDirectoryScreen extends StatefulWidget {
   const StudentDirectoryScreen({super.key});
 
+  @override
+  State<StudentDirectoryScreen> createState() => _StudentDirectoryScreenState();
+}
+
+class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
+  String _selectedFilter = 'All';
+
   final List<StudentProfile> _students = const [
-    StudentProfile(
-      id: 'STU001',
-      name: 'Rahul Kumar',
-      rollNumber: '2024-A-01',
-      className: 'Grade 8-B',
-      photoUrl: '',
-      achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'],
-      leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)'],
-    ),
-    StudentProfile(
-      id: 'STU042',
-      name: 'Sneha Singh',
-      rollNumber: '2024-A-42',
-      className: 'Grade 9-A',
-      photoUrl: '',
-      feeHistory: ['Term 1 - Paid', 'Term 2 - Pending'],
-    ),
+    StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'RCD 1', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
+    StudentProfile(id: 'STU042', name: 'Sneha Singh', rollNumber: '2024-A-42', className: 'RCD 2', photoUrl: '', feeHistory: ['Term 1 - Paid', 'Term 2 - Pending']),
+    StudentProfile(id: 'STU088', name: 'Priya Sharma', rollNumber: '2024-B-12', className: 'RCD 1', photoUrl: ''),
+    StudentProfile(id: 'STU099', name: 'Arjun Das', rollNumber: '2024-C-05', className: 'RCD 2', photoUrl: '', achievements: ['Debate Team Lead']),
+    StudentProfile(id: 'STU105', name: 'Vikram Singh', rollNumber: '2024-C-10', className: 'RCD 1', photoUrl: '', feeHistory: ['Term 1 - Paid']),
+    StudentProfile(id: 'STU112', name: 'Ananya Patel', rollNumber: '2024-D-22', className: 'RCD 2', photoUrl: '', achievements: ['Math Olympiad Medalist']),
+    StudentProfile(id: 'STU133', name: 'Neha Gupta', rollNumber: '2024-A-15', className: 'RCD 1', photoUrl: ''),
+    StudentProfile(id: 'STU145', name: 'Karan Malhotra', rollNumber: '2024-B-08', className: 'RCD 2', photoUrl: ''),
   ];
 
   @override
   Widget build(BuildContext context) {
+    List<StudentProfile> _filteredStudents = _students;
+    if (_selectedFilter != 'All') {
+      _filteredStudents = _students.where((s) => s.className == _selectedFilter).toList();
+    }
+
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Student Directory'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search students...',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+        title: const Text('Students Directory', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: Column(
+        children: [
+          _buildFilterRow(),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 30,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.62,
               ),
+              itemCount: _filteredStudents.length,
+              itemBuilder: (context, index) {
+                final student = _filteredStudents[index];
+                final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
+                final bgColor = colors[index % colors.length];
+
+                return GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            borderRadius: BorderRadius.circular(20),
+                            image: DecorationImage(
+                              image: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        student.name.split(' ')[0],
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        student.className,
+                        style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
-        ),
+        ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _students.length,
+    );
+  }
+
+  Widget _buildFilterRow() {
+    final filters = ['All', 'RCD 1', 'RCD 2'];
+    return SizedBox(
+      height: 55,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        itemCount: filters.length,
         itemBuilder: (context, index) {
-          final student = _students[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.grey[100]!),
-            ),
-            child: ListTile(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student))),
-              contentPadding: const EdgeInsets.all(16),
-              leading: CircleAvatar(
-                radius: 28,
-                backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-                child: Text(student.name[0], style: const TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
-              ),
-              title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${student.rollNumber} • ${student.className}', style: const TextStyle(fontSize: 12)),
-              trailing: const Icon(Icons.chevron_right, size: 20),
+          final filter = filters[index];
+          final isSelected = filter == _selectedFilter;
+          return Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: ChoiceChip(
+              label: Text(filter),
+              selected: isSelected,
+              onSelected: (selected) {
+                if (selected) setState(() => _selectedFilter = filter);
+              },
+              selectedColor: Colors.black,
+              labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
+              backgroundColor: Colors.grey.shade100,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              side: BorderSide.none,
             ),
           );
         },
@@ -81,54 +131,86 @@ class StudentDirectoryScreen extends StatelessWidget {
 
 class StudentProfileDetailScreen extends StatelessWidget {
   final StudentProfile student;
-  const StudentProfileDetailScreen({super.key, required this.student});
+  final Color bgColor;
+  const StudentProfileDetailScreen({super.key, required this.student, required this.bgColor});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text('Student Profile'), elevation: 0),
+      appBar: AppBar(
+        title: const Text('Student Profile', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(32),
-              decoration: const BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40)),
-              ),
-              child: Column(
-                children: [
-                  CircleAvatar(radius: 50, backgroundColor: Colors.white24, child: Text(student.name[0], style: const TextStyle(fontSize: 40, color: Colors.white))),
-                  const SizedBox(height: 16),
-                  Text(student.name, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                  Text(student.rollNumber, style: const TextStyle(color: Colors.white70)),
-                ],
+            const SizedBox(height: 10),
+            Center(
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(45),
+                  boxShadow: [
+                    BoxShadow(color: bgColor.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10)),
+                  ],
+                  image: DecorationImage(
+                    image: NetworkImage('https://i.pravatar.cc/500?u=${student.id}'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
             ),
-            Padding(
+            const SizedBox(height: 24),
+            Text(student.name, style: const TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${student.className} • ${student.rollNumber}',
+                style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            ),
+            const SizedBox(height: 48),
+            Container(
+              width: double.infinity,
               padding: const EdgeInsets.all(25),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildDetailSection(Icons.emoji_events_outlined, 'Achievements', student.achievements),
+                  _buildPremiumDetailSection(Icons.emoji_events_outlined, 'Achievements', student.achievements),
                   const SizedBox(height: 24),
-                  _buildDetailSection(Icons.calendar_today_rounded, 'Leave History', student.leaveHistory),
+                  _buildPremiumDetailSection(Icons.calendar_today_rounded, 'Leave History', student.leaveHistory),
                   const SizedBox(height: 24),
-                  _buildDetailSection(Icons.payments_outlined, 'Fee Status', student.feeHistory),
-                  const SizedBox(height: 40),
+                  _buildPremiumDetailSection(Icons.payments_outlined, 'Fee Status', student.feeHistory),
+                  const SizedBox(height: 48),
                   Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                     child: const Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue),
-                        SizedBox(width: 12),
-                        Expanded(child: Text('This profile is view-only for volunteers.', style: TextStyle(color: Colors.blue, fontSize: 12))),
+                        Icon(Icons.info_outline, color: Colors.white),
+                        SizedBox(width: 16),
+                        Expanded(child: Text('This profile is view-only for volunteers.', style: TextStyle(color: Colors.white, fontSize: 13))),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -138,24 +220,31 @@ class StudentProfileDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailSection(IconData icon, String title, List<String> items) {
+  Widget _buildPremiumDetailSection(IconData icon, String title, List<String> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, size: 18, color: AppTheme.textSecondary),
-            const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 0.5)),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(color: Color(0xFFF5F5F5), shape: BoxShape.circle),
+              child: Icon(icon, size: 18, color: Colors.black),
+            ),
+            const SizedBox(width: 12),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black, letterSpacing: 0.5, fontSize: 16)),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         if (items.isEmpty)
-          const Text('No records found', style: TextStyle(color: Colors.grey, fontSize: 13, fontStyle: FontStyle.italic))
+          const Padding(
+            padding: EdgeInsets.only(left: 48),
+            child: Text('No records found', style: TextStyle(color: Colors.grey, fontSize: 13, fontStyle: FontStyle.italic)),
+          )
         else
           ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text('• $item', style: const TextStyle(fontSize: 14, height: 1.4)),
+            padding: const EdgeInsets.only(left: 48, bottom: 12),
+            child: Text('• $item', style: const TextStyle(fontSize: 14, height: 1.4, color: AppTheme.textPrimary)),
           )),
       ],
     );

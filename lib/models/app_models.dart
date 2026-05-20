@@ -46,6 +46,8 @@ class StudentProfile {
   });
 }
 
+final ValueNotifier<int> globalPendingRequestsCount = ValueNotifier(3);
+
 enum RequestType { leave, fee, achievement }
 enum RequestStatus { pending, accepted, rejected }
 

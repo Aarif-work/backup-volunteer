@@ -11,63 +11,54 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverHeader(context),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                children: [
-                   _buildActionList(context),
-                   const SizedBox(height: 32),
-                   _buildSettingsList(),
-                   const SizedBox(height: 48),
-                   _buildLogoutButton(context),
-                   const SizedBox(height: 24),
-                   const Text('HOPE3 Volunteer v1.2.0', style: TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
-                   const SizedBox(height: 100),
-                ],
-              ),
-            ),
-          ),
-        ],
+      appBar: AppBar(
+        title: const Text('My Profile', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(25),
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            const SizedBox(height: 32),
+            _buildActionList(context),
+            const SizedBox(height: 32),
+            _buildSettingsList(),
+            const SizedBox(height: 48),
+            _buildLogoutButton(context),
+            const SizedBox(height: 24),
+            const Text('HOPE3 Volunteer v1.2.0', style: TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSliverHeader(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 200,
-      pinned: true,
-      backgroundColor: AppTheme.primaryColor,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(gradient: AppTheme.primaryGradient),
-          child: SafeArea(
-            bottom: false,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white24,
-                  child: const FaIcon(FontAwesomeIcons.userLarge, color: Colors.white, size: 30),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'John Volunteer',
-                  style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const Text(
-                  'ID: HOPE3-2024-089',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
+  Widget _buildProfileHeader() {
+    return Row(
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: AppTheme.yellowAction,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 4),
           ),
+          alignment: Alignment.center,
+          child: const FaIcon(FontAwesomeIcons.userLarge, color: Colors.white, size: 36),
         ),
-      ),
+        const SizedBox(width: 20),
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('John Volunteer', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black)),
+            Text('ID: HOPE3-2024-089', style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+          ],
+        ),
+      ],
     );
   }
 

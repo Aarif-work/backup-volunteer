@@ -117,19 +117,16 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
                   return _buildAuditCard(exp);
                 },
               ),
-              const SizedBox(height: 100),
+               const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90),
-        child: FloatingActionButton.extended(
-          onPressed: () => _showAddExpenseDialog(context),
-          backgroundColor: AppTheme.primaryColor,
-          icon: const Icon(Icons.add_task_rounded, color: Colors.white),
-          label: const Text('Add Records', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddExpenseDialog(context),
+        backgroundColor: AppTheme.primaryColor,
+        icon: const Icon(Icons.add_task_rounded, color: Colors.white),
+        label: const Text('Add Records', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -138,9 +135,10 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
+        color: AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(32),
-        boxShadow: [BoxShadow(color: AppTheme.primaryColor.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10))],
+        border: Border.all(color: Colors.grey.shade100, width: 2),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 10))],
       ),
       child: Column(
         children: [
@@ -150,29 +148,32 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Available for Refund', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  const Text('Available for Refund', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Text(
                     '₹ ${_totalRemainingRefund.toStringAsFixed(2)}',
-                    style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: AppTheme.primaryText, fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: Colors.white12, borderRadius: BorderRadius.circular(16)),
+                padding: const EdgeInsets.all(14),
+                decoration: const BoxDecoration(
+                  gradient: AppTheme.warmSunsetGradient,
+                  shape: BoxShape.circle,
+                ),
                 child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 28),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          const Divider(color: Colors.white24),
+          const Divider(color: Color(0xFFEEEEEE)),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryStat('WAITING', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}'),
-              _buildSummaryStat('TOTAL RECORDED', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}'),
+              _buildSummaryStat('WAITING', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', AppTheme.peachAccent),
+              _buildSummaryStat('TOTAL RECORDED', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', AppTheme.primaryText),
             ],
           ),
         ],
@@ -180,13 +181,13 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
     );
   }
 
-  Widget _buildSummaryStat(String label, String value) {
+  Widget _buildSummaryStat(String label, String value, Color valueColor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-        const SizedBox(height: 2),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(label, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+        const SizedBox(height: 4),
+        Text(value, style: TextStyle(color: valueColor, fontSize: 18, fontWeight: FontWeight.bold)),
       ],
     );
   }
