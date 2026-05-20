@@ -190,6 +190,13 @@ class StudentProfileDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildPremiumDetailSection(Icons.location_on_outlined, 'Location Status', [
+                    student.isLocationOff 
+                      ? 'Location Services: OFF' 
+                      : 'Current Location: ${student.currentLocation.name.toUpperCase()}',
+                    student.isPermittedToLeave ? 'Permission: Authorized' : 'Permission: Restricted (Unauthorized Outing Alert)',
+                  ]),
+                  const SizedBox(height: 24),
                   _buildPremiumDetailSection(Icons.emoji_events_outlined, 'Achievements', student.achievements),
                   const SizedBox(height: 24),
                   _buildPremiumDetailSection(Icons.calendar_today_rounded, 'Leave History', student.leaveHistory),

@@ -10,259 +10,139 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  String _selectedFilter = 'All';
-  
-  final List<StudentRequest> _requests = [
-    StudentRequest(
-      id: 'r1',
-      studentName: 'Rahul Kumar',
-      studentId: 'STU001',
-      type: RequestType.leave,
-      description: 'Requesting 2 days leave for sister\'s wedding.',
-      date: DateTime.now().subtract(const Duration(hours: 2)),
+  final List<AppNotification> _notifications = [
+    AppNotification(
+      id: 'n1',
+      title: 'Geofence Alert: Out of Area',
+      message: 'Student Rahul Kumar (STU001) is outside the permitted area without leave approval.',
+      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
+      icon: Icons.location_off_rounded,
+      color: Colors.red,
     ),
-    StudentRequest(
-      id: 'r2',
-      studentName: 'Sneha Singh',
-      studentId: 'STU042',
-      type: RequestType.fee,
-      description: 'Requesting assistance for Term 2 library fees (₹500).',
-      date: DateTime.now().subtract(const Duration(hours: 5)),
+    AppNotification(
+      id: 'n2',
+      title: 'Location Services Disabled',
+      message: 'Sneha Singh (STU042) has turned off location services.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+      icon: Icons.gps_off_rounded,
+      color: Colors.orange,
     ),
-    StudentRequest(
-      id: 'r3',
-      studentName: 'Amit Patel',
-      studentId: 'STU112',
-      type: RequestType.achievement,
-      description: 'Won 1st prize in Zonal Science Fair. Uploading certificate.',
-      date: DateTime.now().subtract(const Duration(days: 1)),
+    AppNotification(
+      id: 'n3',
+      title: 'Geofence Alert: Out of Area',
+      message: 'Amit Patel (STU112) is outside the permitted area.',
+      timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+      icon: Icons.location_off_rounded,
+      color: Colors.red,
+    ),
+    AppNotification(
+      id: 'n4',
+      title: 'Welcome to Hope3',
+      message: 'New volunteer guidelines have been updated in the portal.',
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+      icon: Icons.info_outline_rounded,
+      color: Colors.blue,
+      isRead: true,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    List<StudentRequest> filteredRequests = _requests;
-    if (_selectedFilter != 'All') {
-      filteredRequests = _requests.where((r) => r.type.name.toLowerCase() == _selectedFilter.toLowerCase()).toList();
-    }
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Student Requests', style: TextStyle(color: Colors.black)),
+        title: const Text('Notifications', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Column(
-        children: [
-          _buildFilterRow(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                _buildSectionHeader('PENDING APPROVALS'),
-                ...filteredRequests.where((r) => r.status == RequestStatus.pending).map((r) => _buildRequestCard(r)),
-                const SizedBox(height: 32),
-                _buildSectionHeader('ACTION HISTORY'),
-                ...filteredRequests.where((r) => r.status != RequestStatus.pending).map((r) => _buildRequestCard(r)),
-              ],
-            ),
+        actions: [
+          TextButton(
+            onPressed: () {},
+            child: const Text('Mark all read', style: TextStyle(color: Colors.blue, fontSize: 13)),
           ),
+          const SizedBox(width: 10),
         ],
       ),
-    );
-  }
-
-  Widget _buildFilterRow() {
-    final filters = ['All', 'Leave', 'Fee', 'Achievement'];
-    return SizedBox(
-      height: 50,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: filters.length,
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        itemCount: _notifications.length,
         itemBuilder: (context, index) {
-          final filter = filters[index];
-          final isSelected = filter == _selectedFilter;
-          return Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedFilter = filter),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
-                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))] : [],
-                ),
-                child: Center(
-                  child: Text(
-                    filter,
-                    style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                ),
-              ),
-            ),
-          );
+          final notification = _notifications[index];
+          return _buildNotificationCard(notification);
         },
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textSecondary, fontSize: 11, letterSpacing: 1.1),
-      ),
-    );
-  }
-
-  Widget _buildRequestCard(StudentRequest request) {
-    IconData typeIcon;
-    Color typeColor;
-    switch (request.type) {
-      case RequestType.leave:
-        typeIcon = Icons.calendar_today_rounded;
-        typeColor = Colors.orange;
-        break;
-      case RequestType.fee:
-        typeIcon = Icons.payments_outlined;
-        typeColor = Colors.blue;
-        break;
-      case RequestType.achievement:
-        typeIcon = Icons.emoji_events_outlined;
-        typeColor = Colors.purple;
-        break;
-    }
-
+  Widget _buildNotificationCard(AppNotification notification) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: notification.isRead ? Colors.white : notification.color.withOpacity(0.03),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[100]!),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: typeColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(18),
-                  image: DecorationImage(
-                    image: NetworkImage('https://i.pravatar.cc/150?u=${request.studentId}'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: typeColor, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 1.5)),
-                    child: Icon(typeIcon, color: Colors.white, size: 10),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(request.studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
-                    const SizedBox(height: 2),
-                    Text('${request.type.name.toUpperCase()} • ${request.studentId}', style: const TextStyle(color: AppTheme.secondaryText, fontSize: 11, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ),
-              if (request.status != RequestStatus.pending)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: request.status == RequestStatus.accepted ? Colors.green[50] : Colors.red[50],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    request.status.name.toUpperCase(),
-                    style: TextStyle(color: request.status == RequestStatus.accepted ? Colors.green : Colors.red, fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(request.description, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, height: 1.4)),
-          if (request.status == RequestStatus.pending) ...[
-            const SizedBox(height: 16),
-            const Divider(color: Color(0xFFEEEEEE)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () {
-                      setState(() => request.status = RequestStatus.rejected);
-                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
-                    },
-                    icon: const Icon(Icons.close, size: 18, color: Colors.red),
-                    label: const Text('Reject', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                Container(width: 1, height: 24, color: Colors.grey[300]),
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: () {
-                      setState(() => request.status = RequestStatus.accepted);
-                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
-                    },
-                    icon: const Icon(Icons.check, size: 18, color: Colors.green),
-                    label: const Text('Accept', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationItem(String title, String body, IconData icon, Color color, String time) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[100]!),
+        border: Border.all(color: notification.isRead ? Colors.grey[100]! : notification.color.withOpacity(0.1)),
+        boxShadow: notification.isRead 
+          ? [] 
+          : [BoxShadow(color: notification.color.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 18),
-          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: notification.color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(notification.icon, color: notification.color, size: 20),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                Text(body, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        notification.title,
+                        style: TextStyle(
+                          fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.bold,
+                          fontSize: 15,
+                          color: AppTheme.primaryText,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      _formatTimestamp(notification.timestamp),
+                      style: const TextStyle(color: AppTheme.secondaryText, fontSize: 11),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  notification.message,
+                  style: TextStyle(
+                    color: notification.isRead ? AppTheme.secondaryText : AppTheme.primaryText.withOpacity(0.8),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
               ],
             ),
           ),
-          Text(time, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 9)),
         ],
       ),
     );
+  }
+
+  String _formatTimestamp(DateTime dt) {
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
   }
 }

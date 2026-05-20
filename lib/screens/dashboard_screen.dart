@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'notification_screen.dart';
+import 'requests_screen.dart';
 import 'student_directory_screen.dart';
+import 'student_location_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -33,7 +35,16 @@ class DashboardScreen extends StatelessWidget {
                   Icons.pending_actions_rounded,
                   AppTheme.yellowGradient,
                   AppTheme.yellowAccent,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen())),
+                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RequestsScreen())),
+                ),
+                _buildActionCard(
+                  context,
+                  'Student Locations',
+                  '2 alerts active',
+                  Icons.location_on_rounded,
+                  AppTheme.peachGradient,
+                  AppTheme.peachAccent,
+                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentLocationScreen())),
                 ),
                 _buildActionCard(
                   context,
@@ -70,17 +81,50 @@ class DashboardScreen extends StatelessWidget {
               ),
             ],
         ),
-        Container(
-          width: 52,
-          height: 52,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppTheme.warmSunsetGradient,
-            boxShadow: [
-              BoxShadow(color: AppTheme.pinkAccent.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
-            ],
-          ),
-          child: const Center(child: Icon(Icons.person, color: Colors.white, size: 28)),
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen())),
+              child: Stack(
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 8)),
+                      ],
+                    ),
+                    child: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 28),
+                  ),
+                  Positioned(
+                    right: 12,
+                    top: 12,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppTheme.warmSunsetGradient,
+                boxShadow: [
+                  BoxShadow(color: AppTheme.pinkAccent.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+                ],
+              ),
+              child: const Center(child: Icon(Icons.person, color: Colors.white, size: 28)),
+            ),
+          ],
         ),
       ],
     );
@@ -89,7 +133,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildQuickStats(BuildContext context) {
     return Row(
       children: [
-        _buildStatItem('3', 'Requests', AppTheme.lavenderGradient, AppTheme.lavenderAccent, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen()))),
+        _buildStatItem('3', 'Requests', AppTheme.lavenderGradient, AppTheme.lavenderAccent, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RequestsScreen()))),
         const SizedBox(width: 16),
         _buildStatItem('42', 'Students', AppTheme.peachGradient, AppTheme.peachAccent, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentDirectoryScreen()))),
       ],

@@ -23,7 +23,8 @@ class AppUser {
   });
 }
 
-// --- STUDENT MODELS ---
+enum StudentLocation { hostel, college, home, leave, unknown }
+
 class StudentProfile {
   final String id;
   final String name;
@@ -33,6 +34,9 @@ class StudentProfile {
   final List<String> achievements;
   final List<String> leaveHistory;
   final List<String> feeHistory;
+  final StudentLocation currentLocation;
+  final bool isLocationOff;
+  final bool isPermittedToLeave;
 
   const StudentProfile({
     required this.id,
@@ -43,6 +47,29 @@ class StudentProfile {
     this.achievements = const [],
     this.leaveHistory = const [],
     this.feeHistory = const [],
+    this.currentLocation = StudentLocation.unknown,
+    this.isLocationOff = false,
+    this.isPermittedToLeave = true,
+  });
+}
+
+class AppNotification {
+  final String id;
+  final String title;
+  final String message;
+  final DateTime timestamp;
+  final IconData icon;
+  final Color color;
+  final bool isRead;
+
+  AppNotification({
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.timestamp,
+    required this.icon,
+    required this.color,
+    this.isRead = false,
   });
 }
 

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
 import 'expense_center.dart';
 import 'profile_screen.dart';
-import 'notification_screen.dart';
+import 'requests_screen.dart';
+import 'student_location_screen.dart';
 import '../theme/app_theme.dart';
 import '../models/app_models.dart';
 
@@ -18,7 +19,8 @@ class _MainNavigationContainerState extends State<MainNavigationContainer> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const NotificationScreen(),
+    const RequestsScreen(),
+    const StudentLocationScreen(),
     const ExpenseCenterScreen(),
     const ProfileScreen(),
   ];
@@ -61,8 +63,9 @@ class _MainNavigationContainerState extends State<MainNavigationContainer> {
             children: [
               _buildNavItem(0, Icons.grid_view_rounded, 'Home', 0),
               _buildNavItem(1, Icons.pending_actions_rounded, 'Requests', count),
-              _buildNavItem(2, Icons.account_balance_wallet_rounded, 'Finance', 0),
-              _buildNavItem(3, Icons.person_rounded, 'Profile', 0),
+              _buildNavItem(2, Icons.location_on_rounded, 'Location', 0),
+              _buildNavItem(3, Icons.account_balance_wallet_rounded, 'Finance', 0),
+              _buildNavItem(4, Icons.person_rounded, 'Profile', 0),
             ],
           );
         },
