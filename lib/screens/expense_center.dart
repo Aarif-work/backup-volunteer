@@ -13,8 +13,8 @@ class ExpenseCenterScreen extends StatefulWidget {
 
 class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
   ApprovalStatus? _filterStatus;
+  final ScrollController _scrollController = ScrollController();
   
-  // Local state for persistence during the session
   final List<ExpenseRecord> _expenses = [
     ExpenseRecord(
       id: '1',
@@ -63,221 +63,252 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<ExpenseRecord> filteredExpenses = _expenses;
+    if (_filterStatus != null) {
+      filteredExpenses = _expenses.where((e) => e.status == _filterStatus).toList();
+    }
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Finance Center'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.description_outlined),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Generating PDF Report...')),
-              );
-            },
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: CustomScrollView(
+        controller: _scrollController,
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          _buildSliverHeader(),
+          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          _buildStatusFilter(),
+          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _buildModernAuditCard(filteredExpenses[index]),
+                childCount: filteredExpenses.length,
+              ),
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.download_rounded),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Excel Spreadsheet Exported')),
-              );
-            },
-          ),
+          SliverToBoxAdapter(child: const SizedBox(height: 100)),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddExpenseDialog(context),
+        backgroundColor: Colors.black,
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text('Add Record', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildSliverHeader() {
+    return SliverAppBar(
+      expandedHeight: 220.0,
+      floating: false,
+      pinned: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1ABC9C), Color(0xFF16A085)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(40),
+              bottomRight: Radius.circular(40),
+            ),
+          ),
+          child: Stack(
             children: [
-              _buildUtilityCard(),
-              const SizedBox(height: 32),
-              _buildStatusFilter(),
-              const SizedBox(height: 24),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('AUDIT TRAIL', 
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1.2)),
-                  Icon(Icons.filter_list, size: 16, color: AppTheme.textSecondary),
-                ],
+              Positioned(
+                top: 50,
+                right: -30,
+                child: Icon(Icons.account_balance_wallet_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
               ),
-              const SizedBox(height: 16),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _expenses.length,
-                itemBuilder: (context, index) {
-                  final exp = _expenses[index];
-                  if (_filterStatus != null && exp.status != _filterStatus) {
-                    return const SizedBox.shrink();
-                  }
-                  return _buildAuditCard(exp);
-                },
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Finance Center',
+                            style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating PDF Report...')));
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.download_rounded, color: Colors.white70, size: 20),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Excel Spreadsheet Exported')));
+                                },
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      Text(
+                        '₹ ${_totalRemainingRefund.toStringAsFixed(0)}',
+                        style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Available for Refund', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          _buildHeaderStat('Waiting', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', Icons.pending_actions_rounded, Colors.orangeAccent),
+                          const SizedBox(width: 24),
+                          _buildHeaderStat('Recorded', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', Icons.fact_check_rounded, Colors.blueAccent),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
-               const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddExpenseDialog(context),
-        backgroundColor: AppTheme.primaryColor,
-        icon: const Icon(Icons.add_task_rounded, color: Colors.white),
-        label: const Text('Add Records', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
     );
   }
 
-  Widget _buildUtilityCard() {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.grey.shade100, width: 2),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 10))],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Available for Refund', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(
-                    '₹ ${_totalRemainingRefund.toStringAsFixed(2)}',
-                    style: const TextStyle(color: AppTheme.primaryText, fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: const BoxDecoration(
-                  gradient: AppTheme.warmSunsetGradient,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 28),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Divider(color: Color(0xFFEEEEEE)),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSummaryStat('WAITING', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', AppTheme.peachAccent),
-              _buildSummaryStat('TOTAL RECORDED', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', AppTheme.primaryText),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryStat(String label, String value, Color valueColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildHeaderStat(String label, String value, IconData icon, Color color) {
+    return Row(
       children: [
-        Text(label, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        const SizedBox(height: 4),
-        Text(value, style: TextStyle(color: valueColor, fontSize: 18, fontWeight: FontWeight.bold)),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+          ],
+        )
       ],
     );
   }
 
   Widget _buildStatusFilter() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _buildFilterChip('All Records', null),
-          _buildFilterChip('Pending', ApprovalStatus.pending),
-          _buildFilterChip('Approved', ApprovalStatus.approved),
-          _buildFilterChip('Rejected', ApprovalStatus.rejected),
-        ],
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 50,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          children: [
+            _buildFilterChip('All Records', null),
+            _buildFilterChip('Pending', ApprovalStatus.pending),
+            _buildFilterChip('Approved', ApprovalStatus.approved),
+            _buildFilterChip('Rejected', ApprovalStatus.rejected),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildFilterChip(String label, ApprovalStatus? status) {
     bool isSelected = _filterStatus == status;
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (val) => setState(() => _filterStatus = status),
-        backgroundColor: Colors.white,
-        selectedColor: AppTheme.primaryColor,
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : AppTheme.textSecondary,
-          fontSize: 12,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return GestureDetector(
+      onTap: () => setState(() => _filterStatus = status),
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))] : [],
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: isSelected ? AppTheme.primaryColor : Colors.grey[200]!)),
-        showCheckmark: false,
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildAuditCard(ExpenseRecord expense) {
+  Widget _buildModernAuditCard(ExpenseRecord expense) {
     Color statusColor = expense.status == ApprovalStatus.approved ? AppTheme.accentColor : (expense.status == ApprovalStatus.pending ? Colors.orange : Colors.red);
     
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey[50]!),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 8))],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: expense.isPrivate ? Colors.grey[50] : AppTheme.primaryLight, 
-            borderRadius: BorderRadius.circular(18)
-          ),
-          child: Icon(
-            expense.isPrivate ? Icons.lock_outline_rounded : Icons.receipt_long_rounded, 
-            color: expense.isPrivate ? Colors.grey : AppTheme.primaryColor, 
-            size: 22
-          ),
-        ),
-        title: Text(
-          expense.title, 
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text(
-            '${expense.date.day}/${expense.date.month} • ${expense.category.name.toUpperCase()}', 
-            style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)
-          ),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '₹ ${expense.amount.toStringAsFixed(0)}', 
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textPrimary)
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: expense.isPrivate ? Colors.grey.shade100 : statusColor.withOpacity(0.1), 
+              borderRadius: BorderRadius.circular(20)
             ),
-            const SizedBox(height: 4),
-            Text(
-              expense.status.name.toUpperCase(), 
-              style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 1)
+            child: Icon(
+              expense.isPrivate ? Icons.lock_outline_rounded : Icons.receipt_long_rounded, 
+              color: expense.isPrivate ? Colors.grey : statusColor, 
+              size: 24
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  expense.title, 
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${expense.date.day}/${expense.date.month} • ${expense.category.name.toUpperCase()}', 
+                  style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.w600)
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '₹ ${expense.amount.toStringAsFixed(0)}', 
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryText)
+              ),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  expense.status.name.toUpperCase(), 
+                  style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -298,6 +329,7 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
   }
 }
 
+// Keep AddExpenseForm the same
 class AddExpenseForm extends StatefulWidget {
   final Function(ExpenseRecord) onSubmitted;
   const AddExpenseForm({super.key, required this.onSubmitted});

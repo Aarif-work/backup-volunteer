@@ -13,6 +13,7 @@ class StudentLocationScreen extends StatefulWidget {
 class _StudentLocationScreenState extends State<StudentLocationScreen> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   final ScrollController _scrollController = ScrollController();
+  String _selectedFilter = 'All';
 
   final List<StudentProfile> _students = [
     StudentProfile(
@@ -67,6 +68,18 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
+    List<StudentProfile> filteredStudents = _students.where((student) {
+      if (_selectedFilter == 'All') return true;
+      
+      bool hasAlert = student.isLocationOff || (student.currentLocation == StudentLocation.unknown && !student.isPermittedToLeave);
+      if (_selectedFilter.startsWith('Alerts')) return hasAlert;
+      if (_selectedFilter.startsWith('Hostel')) return student.currentLocation == StudentLocation.hostel && !student.isLocationOff;
+      if (_selectedFilter.startsWith('College')) return student.currentLocation == StudentLocation.college && !student.isLocationOff;
+      if (_selectedFilter.startsWith('On Leave')) return student.currentLocation == StudentLocation.home && !student.isLocationOff;
+      
+      return true;
+    }).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: CustomScrollView(
@@ -81,12 +94,12 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildModernTrackingCard(_students[index]),
-                childCount: _students.length,
+                (context, index) => _buildModernTrackingCard(filteredStudents[index]),
+                childCount: filteredStudents.length,
               ),
             ),
           ),
-          SliverToBoxAdapter(child: const SizedBox(height: 40)),
+          SliverToBoxAdapter(child: const SizedBox(height: 100)),
         ],
       ),
     );
@@ -94,7 +107,7 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
 
   Widget _buildSliverHeader() {
     return SliverAppBar(
-      expandedHeight: 220.0,
+      expandedHeight: 180.0,
       floating: false,
       pinned: true,
       backgroundColor: Colors.transparent,
@@ -123,19 +136,19 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
                         'Live Radar',
-                        style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                        style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       const Text(
                         'Student Monitoring',
-                        style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
                       ),
-                      const Spacer(),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
                           _buildHeaderStat('Actively Tracked', '4', Icons.my_location_rounded, Colors.greenAccent),
@@ -183,31 +196,39 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
           padding: const EdgeInsets.symmetric(horizontal: 24),
           physics: const BouncingScrollPhysics(),
           children: [
-            _buildStatusChip('All', true),
-            _buildStatusChip('Hostel (1)', false),
-            _buildStatusChip('College (1)', false),
-            _buildStatusChip('On Leave (1)', false),
-            _buildStatusChip('Alerts (2)', false),
+            _buildStatusChip('All'),
+            _buildStatusChip('Hostel (1)'),
+            _buildStatusChip('College (1)'),
+            _buildStatusChip('On Leave (1)'),
+            _buildStatusChip('Alerts (2)'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatusChip(String label, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.white,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
-        boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))] : [],
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+  Widget _buildStatusChip(String label) {
+    bool isSelected = _selectedFilter == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
+          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))] : [],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+          ),
         ),
       ),
     );

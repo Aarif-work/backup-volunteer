@@ -190,6 +190,14 @@ class StudentProfileDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildPremiumDetailSection(Icons.person_pin_rounded, 'Personal Details', [
+                    'Phone: +91 98765 43210',
+                    'Blood Group: O+',
+                    'Guardian: Mr. Kumar (Father)',
+                    'Gender: Male',
+                    'DOB: 12 Jan 2009',
+                  ]),
+                  const SizedBox(height: 24),
                   _buildPremiumDetailSection(Icons.location_on_outlined, 'Location Status', [
                     student.isLocationOff 
                       ? 'Location Services: OFF' 

@@ -4,6 +4,7 @@ import 'notification_screen.dart';
 import 'requests_screen.dart';
 import 'student_directory_screen.dart';
 import 'student_location_screen.dart';
+import 'profile_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -69,60 +70,41 @@ class DashboardScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.asset('assets/hope3_logo.png', height: 44),
-              const SizedBox(height: 16),
-              const Text('Welcome back,', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
-              const SizedBox(height: 4),
-              Text(
-                'John Volunteer',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primaryText),
-              ),
-            ],
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset('assets/hope3_logo.png', height: 32),
+            Text(
+              'John Volunteer',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primaryText),
+            ),
+          ],
         ),
         Row(
           children: [
             GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationScreen())),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen())),
               child: Stack(
                 children: [
-                  Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 8)),
-                      ],
-                    ),
-                    child: const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 28),
-                  ),
+                  const Icon(Icons.notifications_none_rounded, color: Colors.black, size: 28),
                   Positioned(
-                    right: 12,
-                    top: 12,
+                    right: 2,
+                    top: 2,
                     child: Container(
-                      width: 10,
-                      height: 10,
+                      width: 8,
+                      height: 8,
                       decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: AppTheme.warmSunsetGradient,
-                boxShadow: [
-                  BoxShadow(color: AppTheme.pinkAccent.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
-                ],
+            const SizedBox(width: 16),
+            GestureDetector(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen())),
+              child: const CircleAvatar(
+                radius: 22,
+                backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'),
               ),
-              child: const Center(child: Icon(Icons.person, color: Colors.white, size: 28)),
             ),
           ],
         ),
