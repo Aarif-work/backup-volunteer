@@ -60,6 +60,18 @@ class AppTheme {
     begin: Alignment.topLeft, end: Alignment.bottomRight,
   );
 
+  static const LinearGradient headerGradient = LinearGradient(
+    colors: [
+      Color(0xFF000000), // Pure black top-left
+      Color(0xFF0A0A0A),  
+      Color(0xFF8E44AD), // Primary purple
+      Color(0xFF9B59B6), // Light purple
+    ],
+    stops: [0.0, 0.3, 0.8, 1.0],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,

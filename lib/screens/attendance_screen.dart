@@ -7,17 +7,87 @@ class AttendanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Attendance')),
-      body: ListView(
-        padding: const EdgeInsets.all(25),
-        children: [
-          _buildSessionCard('Primary Science A', '9:30 AM - 11:30 AM', 'Room 204', true),
-          _buildSessionCard('Secondary Math B', '1:00 PM - 3:00 PM', 'Room 105', false),
-          const SizedBox(height: 32),
-          const Text('UPCOMING SESSIONS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1.2)),
-          const SizedBox(height: 16),
-          _buildUpcomingItem('Health Workshop', 'Tomorrow, 10:00 AM'),
-          _buildUpcomingItem('Art Class', 'Friday, 2:00 PM'),
+      backgroundColor: AppTheme.backgroundColor,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 180.0,
+            floating: false,
+            pinned: true,
+            backgroundColor: const Color(0xFF000000),
+            elevation: 0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+            ),
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  titlePadding: const EdgeInsets.only(bottom: 14),
+                  title: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: collapsed ? 1.0 : 0.0,
+                    child: const Text('ATTENDANCE',
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                  ),
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      gradient: AppTheme.headerGradient,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 50,
+                          right: -30,
+                          child: Icon(Icons.co_present_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
+                        ),
+                        SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Daily Records',
+                                  style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+                                const SizedBox(height: 4),
+                                const Text('Attendance',
+                                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                const Text('Track and manage student presence.',
+                                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(25),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildSessionCard('Primary Science A', '9:30 AM - 11:30 AM', 'Room 204', true),
+                _buildSessionCard('Secondary Math B', '1:00 PM - 3:00 PM', 'Room 105', false),
+                const SizedBox(height: 32),
+                const Text('UPCOMING SESSIONS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary, letterSpacing: 1.2)),
+                const SizedBox(height: 16),
+                _buildUpcomingItem('Health Workshop', 'Tomorrow, 10:00 AM'),
+                _buildUpcomingItem('Art Class', 'Friday, 2:00 PM'),
+                const SizedBox(height: 100),
+              ]),
+            ),
+          ),
         ],
       ),
     );

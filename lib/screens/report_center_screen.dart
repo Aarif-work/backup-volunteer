@@ -8,34 +8,97 @@ class ReportCenterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        title: const Text('Report Center'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Download and share foundation mission reports.',
-              style: TextStyle(color: AppTheme.textSecondary),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 180.0,
+            floating: false,
+            pinned: true,
+            backgroundColor: const Color(0xFF000000),
+            elevation: 0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
             ),
-            const SizedBox(height: 32),
-            _buildReportCategory('Financial Reports'),
-            const SizedBox(height: 12),
-            _buildReportCard('Expense Detailed History', 'Itemized expense records (Excel)', Icons.table_view, Colors.green),
-            _buildReportCard('Refund Status Report', 'Pending vs Processed refunds', Icons.account_balance_wallet, Colors.blue),
-            
-            const SizedBox(height: 32),
-            _buildReportCategory('Activity Reports'),
-            const SizedBox(height: 12),
-            _buildReportCard('Mission Log Summary', 'Volunteer hours and activities', Icons.history, Colors.purple),
-            _buildReportCard('Student Request Summary', 'Trends in leave and fee assistance', Icons.assessment_outlined, Colors.orange),
-            
-            const SizedBox(height: 48),
-            _buildInfoBox(),
-          ],
-        ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+              onPressed: () => Navigator.pop(context),
+            ),
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
+                return FlexibleSpaceBar(
+                  centerTitle: true,
+                  titlePadding: const EdgeInsets.only(bottom: 14),
+                  title: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 200),
+                    opacity: collapsed ? 1.0 : 0.0,
+                    child: const Text('REPORT CENTER',
+                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                  ),
+                  background: Container(
+                    decoration: const BoxDecoration(
+                      gradient: AppTheme.headerGradient,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 50,
+                          right: -30,
+                          child: Icon(Icons.analytics_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
+                        ),
+                        SafeArea(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Data Hub',
+                                  style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+                                const SizedBox(height: 4),
+                                const Text('Report Center',
+                                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 8),
+                                const Text('Download and share foundation mission reports.',
+                                  style: TextStyle(color: Colors.white70, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildReportCategory('Financial Reports'),
+                const SizedBox(height: 12),
+                _buildReportCard('Expense Detailed History', 'Itemized records (Excel)', Icons.table_view, Colors.green),
+                _buildReportCard('Refund Status Report', 'Pending vs Processed', Icons.account_balance_wallet, Colors.blue),
+                
+                const SizedBox(height: 32),
+                _buildReportCategory('Activity Reports'),
+                const SizedBox(height: 12),
+                _buildReportCard('Mission Log Summary', 'Volunteer hours & activities', Icons.history, Colors.purple),
+                _buildReportCard('Student Request Summary', 'Trends in leave & fee assistance', Icons.assessment_outlined, Colors.orange),
+                
+                const SizedBox(height: 48),
+                _buildInfoBox(),
+                const SizedBox(height: 100),
+              ]),
+            ),
+          ),
+        ],
       ),
     );
   }

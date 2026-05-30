@@ -110,59 +110,67 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
       expandedHeight: 180.0,
       floating: false,
       pinned: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF000000),
       elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2C3E50), Color(0xFF3498DB)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+      ),
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
+          return FlexibleSpaceBar(
+            centerTitle: true,
+            titlePadding: const EdgeInsets.only(bottom: 14),
+            title: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: collapsed ? 1.0 : 0.0,
+              child: const Text('STUDENT RADAR',
+                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
             ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: 50,
-                right: -30,
-                child: Icon(Icons.radar_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Live Radar',
-                        style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Student Monitoring',
-                        style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _buildHeaderStat('Actively Tracked', '4', Icons.my_location_rounded, Colors.greenAccent),
-                          const SizedBox(width: 24),
-                          _buildHeaderStat('Critical Alerts', '2', Icons.warning_amber_rounded, Colors.redAccent),
-                        ],
-                      ),
-                    ],
-                  ),
+            background: Container(
+              decoration: const BoxDecoration(
+                gradient: AppTheme.headerGradient,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
               ),
-            ],
-          ),
-        ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 50,
+                    right: -30,
+                    child: Icon(Icons.radar_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
+                  ),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Live Radar',
+                            style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+                          const SizedBox(height: 4),
+                          const Text('Student Monitoring',
+                            style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              _buildHeaderStat('Actively Tracked', '4', Icons.my_location_rounded, Colors.greenAccent),
+                              const SizedBox(width: 24),
+                              _buildHeaderStat('Critical Alerts', '2', Icons.warning_amber_rounded, Colors.redAccent),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

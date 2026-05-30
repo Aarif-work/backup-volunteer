@@ -104,81 +104,93 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
       expandedHeight: 220.0,
       floating: false,
       pinned: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFF000000),
       elevation: 0,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1ABC9C), Color(0xFF16A085)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+      ),
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
+          return FlexibleSpaceBar(
+            centerTitle: true,
+            titlePadding: const EdgeInsets.only(bottom: 14),
+            title: AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: collapsed ? 1.0 : 0.0,
+              child: const Text('FINANCE CENTER',
+                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
             ),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(40),
-              bottomRight: Radius.circular(40),
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: 50,
-                right: -30,
-                child: Icon(Icons.account_balance_wallet_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-              ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Finance Center',
-                            style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1.5),
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating PDF Report...')));
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.download_rounded, color: Colors.white70, size: 20),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Excel Spreadsheet Exported')));
-                                },
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                      Text(
-                        '₹ ${_totalRemainingRefund.toStringAsFixed(0)}',
-                        style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text('Available for Refund', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      const Spacer(),
-                      Row(
-                        children: [
-                          _buildHeaderStat('Waiting', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', Icons.pending_actions_rounded, Colors.orangeAccent),
-                          const SizedBox(width: 24),
-                          _buildHeaderStat('Recorded', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', Icons.fact_check_rounded, Colors.blueAccent),
-                        ],
-                      ),
-                    ],
-                  ),
+            background: Container(
+              decoration: const BoxDecoration(
+                gradient: AppTheme.headerGradient,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
                 ),
               ),
-            ],
-          ),
-        ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 50,
+                    right: -30,
+                    child: Icon(Icons.account_balance_wallet_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
+                  ),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Finance Center',
+                                style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating PDF Report...')));
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.download_rounded, color: Colors.white70, size: 20),
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Excel Spreadsheet Exported')));
+                                    },
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          Text(
+                            '₹ ${_totalRemainingRefund.toStringAsFixed(0)}',
+                            style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Available for Refund', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              _buildHeaderStat('Waiting', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', Icons.pending_actions_rounded, Colors.orangeAccent),
+                              const SizedBox(width: 24),
+                              _buildHeaderStat('Recorded', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', Icons.fact_check_rounded, Colors.blueAccent),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

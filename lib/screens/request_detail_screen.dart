@@ -93,6 +93,50 @@ class RequestDetailScreen extends StatelessWidget {
   }
 
   Widget _buildDetailsCard() {
+    String cardTitle;
+    IconData icon;
+    Color color;
+    Widget details;
+
+    switch (request.type) {
+      case RequestType.leave:
+        cardTitle = 'Leave Details';
+        icon = Icons.calendar_today_rounded;
+        color = Colors.orange;
+        details = Row(
+          children: [
+            _buildInfoItem('From', '22 May 2025'),
+            const SizedBox(width: 40),
+            _buildInfoItem('To', '24 May 2025'),
+          ],
+        );
+        break;
+      case RequestType.fee:
+        cardTitle = 'Fee Assistance Details';
+        icon = Icons.payments_outlined;
+        color = Colors.blue;
+        details = Row(
+          children: [
+            _buildInfoItem('Amount Requested', '₹500'),
+            const SizedBox(width: 40),
+            _buildInfoItem('Category', 'Library Fees'),
+          ],
+        );
+        break;
+      case RequestType.achievement:
+        cardTitle = 'Achievement Verification';
+        icon = Icons.emoji_events_outlined;
+        color = Colors.purple;
+        details = Row(
+          children: [
+            _buildInfoItem('Category', 'Science Fair'),
+            const SizedBox(width: 40),
+            _buildInfoItem('Position', '1st Place'),
+          ],
+        );
+        break;
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -104,17 +148,17 @@ class RequestDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Leave Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 20),
           Row(
             children: [
-              _buildInfoItem('From', '22 May 2025'),
-              const SizedBox(width: 40),
-              _buildInfoItem('To', '24 May 2025'),
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 12),
+              Text(cardTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
           const SizedBox(height: 20),
-          const Text('Reason', style: TextStyle(fontSize: 11, color: AppTheme.secondaryText, fontWeight: FontWeight.bold)),
+          details,
+          const SizedBox(height: 20),
+          const Text('Description', style: TextStyle(fontSize: 11, color: AppTheme.secondaryText, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
             request.description,
