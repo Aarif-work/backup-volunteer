@@ -17,8 +17,12 @@ class MainNavigationContainer extends StatefulWidget {
 class _MainNavigationContainerState extends State<MainNavigationContainer> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const DashboardScreen(),
+  late final List<Widget> _screens = [
+    DashboardScreen(onNavigate: (index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }),
     const RequestsScreen(),
     const StudentLocationScreen(),
     const ExpenseCenterScreen(),

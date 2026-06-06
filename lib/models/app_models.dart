@@ -164,3 +164,24 @@ class ExpenseRecord {
 
   double get remainingBalance => approvedAmount - receivedAmount;
 }
+
+// --- PARENT MODELS ---
+class ParentProfile {
+  final String id;
+  final String name;
+  final String contactNumber;
+  final String email;
+  final String address;
+  final List<String> studentIds; 
+  final List<String> activityHistory; 
+
+  const ParentProfile({
+    required this.id,
+    required this.name,
+    required this.contactNumber,
+    required this.email,
+    required this.address,
+    required this.studentIds,
+    this.activityHistory = const [],
+  });
+}
