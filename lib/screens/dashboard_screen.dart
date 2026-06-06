@@ -25,7 +25,7 @@ class DashboardScreen extends StatelessWidget {
           _buildSliverAppBar(context),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -48,9 +48,9 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 80.0,
       floating: true,
       pinned: true,
+      toolbarHeight: 65,
       backgroundColor: AppTheme.backgroundColor,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
@@ -155,7 +155,7 @@ class DashboardScreen extends StatelessWidget {
                if (onNavigate != null) onNavigate!(1);
                else Navigator.push(context, MaterialPageRoute(builder: (context) => const RequestsScreen()));
             }),
-            _buildMenuTile(context, 'Directory', Icons.group_rounded, AppTheme.peachGradient, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentDirectoryScreen()))),
+            _buildMenuTile(context, 'Students', Icons.group_rounded, AppTheme.peachGradient, () => Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentDirectoryScreen()))),
             _buildMenuTile(context, 'Location', Icons.location_on_rounded, AppTheme.mintGradient, () {
                if (onNavigate != null) onNavigate!(2);
                else Navigator.push(context, MaterialPageRoute(builder: (context) => const StudentLocationScreen()));
@@ -173,27 +173,135 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMenuTile(BuildContext context, String title, IconData icon, LinearGradient gradient, VoidCallback? onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(gradient: gradient, shape: BoxShape.circle),
-              child: Icon(icon, color: Colors.black87, size: 26),
-            ),
-            const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.primaryText)),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          // Soft premium environmental shadow tied to the primary color
+          BoxShadow(
+            color: gradient.colors.first.withOpacity(0.08), // Made lighter as requested
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
+          // Tight crisp shadow for button separation
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(28),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          splashColor: gradient.colors.first.withOpacity(0.25),
+          highlightColor: gradient.colors.first.withOpacity(0.1),
+          child: Stack(
+            children: [
+              // Immersive elegant background wash gradient
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        gradient.colors.first.withOpacity(0.2),
+                        Colors.white.withOpacity(0.0),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: const [0.0, 0.6],
+                    ),
+                  ),
+                ),
+              ),
+
+              // Giant dramatic 'watermark' icon bleeding off the bottom right
+              Positioned(
+                bottom: -20,
+                right: -25,
+                child: Transform.rotate(
+                  angle: -0.25,
+                  child: Icon(
+                    icon,
+                    size: 110,
+                    color: gradient.colors.first.withOpacity(0.08),
+                  ),
+                ),
+              ),
+
+              // Floating 3D crisp icon enclosure top-right
+              Positioned(
+                top: 14,
+                right: 14,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: gradient.colors.first.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => gradient.createShader(bounds),
+                    child: Icon(icon, color: Colors.white, size: 22),
+                  ),
+                ),
+              ),
+
+              // Super clean typography block bottom-left
+              Positioned(
+                bottom: 18,
+                left: 16,
+                right: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontFamily: 'Inter', // Sleek modern system font
+                        fontWeight: FontWeight.w900, // Extra bold
+                        fontSize: 18, // Increased size
+                        color: AppTheme.primaryText,
+                        letterSpacing: -0.2,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          'Tap to open',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.primaryText.withOpacity(0.5),
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 10,
+                          color: AppTheme.primaryText.withOpacity(0.5),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
