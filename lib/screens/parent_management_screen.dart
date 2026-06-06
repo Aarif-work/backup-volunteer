@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/app_models.dart';
+import 'student_directory_screen.dart';
 
 class ParentManagementScreen extends StatefulWidget {
   const ParentManagementScreen({super.key});
@@ -82,21 +83,27 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _ParentDetailBottomSheet(parent: parent, getStudentName: _getStudentName),
+      builder: (context) => ParentDetailBottomSheet(parent: parent, getStudentName: _getStudentName),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 180.0,
-            floating: false,
-            pinned: true,
-            backgroundColor: AppTheme.backgroundColor,
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          Navigator.maybePop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 180.0,
+              floating: false,
+              pinned: true,
+              backgroundColor: AppTheme.backgroundColor,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primaryText),
@@ -169,6 +176,7 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
+      ),
     );
   }
 
@@ -230,15 +238,21 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
   }
 }
 
-class _ParentDetailBottomSheet extends StatelessWidget {
+class ParentDetailBottomSheet extends StatelessWidget {
   final ParentProfile parent;
   final String Function(String) getStudentName;
 
-  const _ParentDetailBottomSheet({required this.parent, required this.getStudentName});
+  const ParentDetailBottomSheet({required this.parent, required this.getStudentName});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          Navigator.maybePop(context);
+        }
+      },
+      child: Container(
       decoration: const BoxDecoration(
         color: AppTheme.backgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -283,7 +297,7 @@ class _ParentDetailBottomSheet extends StatelessWidget {
           const SizedBox(height: 32),
           const Text('LINKED STUDENTS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
           const SizedBox(height: 16),
-          ...parent.studentIds.map((id) => _buildStudentCard(id)),
+          ...parent.studentIds.map((id) => _buildStudentCard(id, context)),
            const SizedBox(height: 32),
           if (parent.activityHistory.isNotEmpty) ...[
             const Text('ACTIVITY HISTORY', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
@@ -300,6 +314,7 @@ class _ParentDetailBottomSheet extends StatelessWidget {
             )),
           ]
         ],
+      ),
       ),
     );
   }
@@ -324,8 +339,25 @@ class _ParentDetailBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentCard(String studentId) {
-    return Container(
+  Widget _buildStudentCard(String studentId, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Push the actual student screen
+        // But to avoid infinite loop, we can just push. If they click parent from there, it will pop.
+        final mockStudent = StudentProfile(
+          id: studentId,
+          name: getStudentName(studentId),
+          rollNumber: '2024-X-xx',
+          className: 'RCD X',
+          photoUrl: '',
+        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => StudentProfileDetailScreen(
+          student: mockStudent, 
+          bgColor: const Color(0xFFBCE1EB),
+          isFromParent: true,
+        )));
+      },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -351,6 +383,7 @@ class _ParentDetailBottomSheet extends StatelessWidget {
           ),
           const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppTheme.secondaryText),
         ],
+      ),
       ),
     );
   }

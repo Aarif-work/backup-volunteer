@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/app_models.dart';
 import '../theme/app_theme.dart';
+import 'parent_management_screen.dart';
 
 class StudentDirectoryScreen extends StatefulWidget {
   const StudentDirectoryScreen({super.key});
@@ -132,104 +133,123 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
 class StudentProfileDetailScreen extends StatelessWidget {
   final StudentProfile student;
   final Color bgColor;
-  const StudentProfileDetailScreen({super.key, required this.student, required this.bgColor});
+  final bool isFromParent;
+  
+  const StudentProfileDetailScreen({
+    super.key, 
+    required this.student, 
+    required this.bgColor,
+    this.isFromParent = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Student Profile', style: TextStyle(color: Colors.black)),
+    final bool swipeEnabled = true;
+
+    return GestureDetector(
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
+          Navigator.maybePop(context);
+        }
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            Center(
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(45),
-                  boxShadow: [
-                    BoxShadow(color: bgColor.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10)),
-                  ],
-                  image: DecorationImage(
-                    image: NetworkImage('https://i.pravatar.cc/500?u=${student.id}'),
-                    fit: BoxFit.cover,
+        appBar: AppBar(
+          title: const Text('Student Profile', style: TextStyle(color: Colors.black)),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.black),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(45),
+                    boxShadow: [
+                      BoxShadow(color: bgColor.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10)),
+                    ],
+                    image: DecorationImage(
+                      image: NetworkImage('https://i.pravatar.cc/500?u=${student.id}'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(student.name, style: const TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(20),
+              const SizedBox(height: 24),
+              Text(student.name, style: const TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${student.className} • ${student.rollNumber}',
+                  style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 13),
+                ),
               ),
-              child: Text(
-                '${student.className} • ${student.rollNumber}',
-                style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-            ),
-            const SizedBox(height: 48),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(25),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildPremiumDetailSection(Icons.person_pin_rounded, 'Personal Details', [
-                    'Phone: +91 98765 43210',
-                    'Blood Group: O+',
-                    'Guardian: Mr. Kumar (Father)',
-                    'Gender: Male',
-                    'DOB: 12 Jan 2009',
-                  ]),
-                  const SizedBox(height: 24),
-                  _buildPremiumDetailSection(Icons.location_on_outlined, 'Location Status', [
-                    student.isLocationOff 
-                      ? 'Location Services: OFF' 
-                      : 'Current Location: ${student.currentLocation.name.toUpperCase()}',
-                    student.isPermittedToLeave ? 'Permission: Authorized' : 'Permission: Restricted (Unauthorized Outing Alert)',
-                  ]),
-                  const SizedBox(height: 24),
-                  _buildPremiumDetailSection(Icons.emoji_events_outlined, 'Achievements', student.achievements),
-                  const SizedBox(height: 24),
-                  _buildPremiumDetailSection(Icons.calendar_today_rounded, 'Leave History', student.leaveHistory),
-                  const SizedBox(height: 24),
-                  _buildPremiumDetailSection(Icons.payments_outlined, 'Fee Status', student.feeHistory),
-                  const SizedBox(height: 48),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(24),
+              const SizedBox(height: 48),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(25),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('PARENT / GUARDIAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
+                    const SizedBox(height: 16),
+                    _buildParentCard(context),
+                    const SizedBox(height: 32),
+                    _buildPremiumDetailSection(Icons.person_pin_rounded, 'Personal Details', [
+                      'Phone: +91 98765 43210',
+                      'Blood Group: O+',
+                      'Gender: Male',
+                      'DOB: 12 Jan 2009',
+                    ]),
+                    const SizedBox(height: 24),
+                    _buildPremiumDetailSection(Icons.location_on_outlined, 'Location Status', [
+                      student.isLocationOff 
+                        ? 'Location Services: OFF' 
+                        : 'Current Location: ${student.currentLocation.name.toUpperCase()}',
+                      student.isPermittedToLeave ? 'Permission: Authorized' : 'Permission: Restricted (Unauthorized Outing Alert)',
+                    ]),
+                    const SizedBox(height: 24),
+                    _buildPremiumDetailSection(Icons.emoji_events_outlined, 'Achievements', student.achievements),
+                    const SizedBox(height: 24),
+                    _buildPremiumDetailSection(Icons.calendar_today_rounded, 'Leave History', student.leaveHistory),
+                    const SizedBox(height: 24),
+                    _buildPremiumDetailSection(Icons.payments_outlined, 'Fee Status', student.feeHistory),
+                    const SizedBox(height: 48),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.white),
+                          SizedBox(width: 16),
+                          Expanded(child: Text('This profile is view-only for volunteers.', style: TextStyle(color: Colors.white, fontSize: 13))),
+                        ],
+                      ),
                     ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.white),
-                        SizedBox(width: 16),
-                        Expanded(child: Text('This profile is view-only for volunteers.', style: TextStyle(color: Colors.white, fontSize: 13))),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                ],
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -258,10 +278,79 @@ class StudentProfileDetailScreen extends StatelessWidget {
           )
         else
           ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(left: 48, bottom: 12),
-            child: Text('• $item', style: const TextStyle(fontSize: 14, height: 1.4, color: AppTheme.textPrimary)),
-          )),
+              padding: const EdgeInsets.only(left: 48, bottom: 12),
+              child: Text('• $item', style: const TextStyle(fontSize: 14, height: 1.4, color: AppTheme.textPrimary)),
+            )),
       ],
+    );
+  }
+
+  Widget _buildParentCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if ((context.widget as dynamic).isFromParent == true) {
+           Navigator.maybePop(context);
+        } else {
+           showModalBottomSheet(
+             context: context,
+             isScrollControlled: true,
+             backgroundColor: Colors.transparent,
+             builder: (context) => ParentDetailBottomSheet(
+               parent: ParentProfile(
+                 id: 'p1',
+                 name: 'Mr. Kumar (Father)',
+                 contactNumber: '+91 98765 43210',
+                 email: 'kumar@example.com',
+                 address: '123 Main St, Springfield',
+                 studentIds: [student.id],
+                 activityHistory: ['Attended PTA meeting', 'Called regarding leave'],
+               ),
+               getStudentName: (id) => student.name,
+             ),
+           );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppTheme.lavenderAccent.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(color: AppTheme.lavenderAccent.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                gradient: AppTheme.lavenderGradient,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.family_restroom_rounded, color: AppTheme.lavenderAccent),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Primary Contact', style: TextStyle(color: AppTheme.secondaryText, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
+                  SizedBox(height: 4),
+                  Text('Mr. Kumar (Father)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
+                  SizedBox(height: 2),
+                  Text('+91 98765 43210', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: AppTheme.lavenderAccent.withOpacity(0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppTheme.lavenderAccent),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
