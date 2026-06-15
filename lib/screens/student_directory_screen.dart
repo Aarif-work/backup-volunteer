@@ -12,6 +12,7 @@ class StudentDirectoryScreen extends StatefulWidget {
 
 class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
   String _selectedFilter = 'All';
+  bool _isGridView = true;
 
   final List<StudentProfile> _students = const [
     StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'RCD 1', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
@@ -38,60 +39,88 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: Icon(_isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded),
+            onPressed: () => setState(() => _isGridView = !_isGridView),
+          ),
+        ],
       ),
       body: Column(
         children: [
           _buildFilterRow(),
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 30,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.62,
-              ),
-              itemCount: _filteredStudents.length,
-              itemBuilder: (context, index) {
-                final student = _filteredStudents[index];
-                final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
-                final bgColor = colors[index % colors.length];
+            child: _isGridView 
+              ? GridView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 30,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.62,
+                  ),
+                  itemCount: _filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = _filteredStudents[index];
+                    final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
+                    final bgColor = colors[index % colors.length];
 
-                return GestureDetector(
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: bgColor,
-                            borderRadius: BorderRadius.circular(20),
-                            image: DecorationImage(
-                              image: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
-                              fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: bgColor,
+                                borderRadius: BorderRadius.circular(20),
+                                image: DecorationImage(
+                                  image: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 10),
+                          Text(
+                            student.name.split(' ')[0],
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            student.className,
+                            style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.w500),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        student.name.split(' ')[0],
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    );
+                  },
+                )
+              : ListView.builder(
+                  itemCount: _filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = _filteredStudents[index];
+                    final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
+                    final bgColor = colors[index % colors.length];
+
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      leading: CircleAvatar(
+                        backgroundColor: bgColor,
+                        backgroundImage: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
+                        radius: 25,
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        student.className,
-                        style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                      title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                      subtitle: Text('${student.className} • ${student.rollNumber}', style: const TextStyle(color: Colors.grey)),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
+                    );
+                  },
+                ),
           ),
         ],
       ),

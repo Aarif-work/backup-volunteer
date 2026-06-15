@@ -48,16 +48,19 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
       filteredRequests = _requests.where((r) => r.type.name.toLowerCase() == _selectedFilter.toLowerCase()).toList();
     }
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: CustomScrollView(
         controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildSliverHeader(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          _buildStatsSection(),
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
           _buildFilterRow(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -72,99 +75,69 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
               ),
             ),
           ),
-          SliverToBoxAdapter(child: const SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildSliverHeader() {
     return SliverAppBar(
-      expandedHeight: 180.0,
-      floating: false,
+      floating: true,
       pinned: true,
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: const Color(0xFFF8F9FA),
       elevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-      ),
-      flexibleSpace: LayoutBuilder(
-        builder: (context, constraints) {
-          final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
-          return FlexibleSpaceBar(
-            centerTitle: true,
-            titlePadding: const EdgeInsets.only(bottom: 14),
-            title: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: collapsed ? 1.0 : 0.0,
-              child: const Text('STUDENT REQUESTS',
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
-            ),
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: AppTheme.headerGradient,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 50,
-                    right: -30,
-                    child: Icon(Icons.assignment_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-                  ),
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Command Center',
-                            style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
-                          const SizedBox(height: 4),
-                          const Text('Student Requests',
-                            style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              _buildHeaderStat('Pending Actions', '${_requests.where((r) => r.status == RequestStatus.pending).length}', Icons.pending_actions_rounded, Colors.orangeAccent),
-                              const SizedBox(width: 24),
-                              _buildHeaderStat('Resolved Today', '${_requests.where((r) => r.status != RequestStatus.pending).length}', Icons.check_circle_rounded, Colors.greenAccent),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      iconTheme: const IconThemeData(color: Colors.black),
+      title: const Text('Student Requests', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
     );
   }
 
-  Widget _buildHeaderStat(String label, String value, IconData icon, Color color) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildStatsSection() {
+    final pendingCount = _requests.where((r) => r.status == RequestStatus.pending).length;
+    final resolvedCount = _requests.where((r) => r.status != RequestStatus.pending).length;
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Pending Actions', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(pendingCount.toString(), style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
+                    const SizedBox(width: 8),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 6),
+                      child: Text('requests', style: TextStyle(fontSize: 14, color: AppTheme.secondaryText, fontWeight: FontWeight.w500)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 16),
+                  const SizedBox(width: 8),
+                  Text('$resolvedCount Resolved', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13)),
+                ],
+              ),
+            ),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
@@ -172,7 +145,7 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
     final filters = ['All', 'Leave', 'Fee', 'Achievement'];
     return SliverToBoxAdapter(
       child: SizedBox(
-        height: 50,
+        height: 40,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
@@ -184,18 +157,17 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
             return GestureDetector(
               onTap: () => setState(() => _selectedFilter = filter),
               child: Container(
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                margin: const EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : Colors.white,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
-                  boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))] : [],
+                  border: Border(bottom: BorderSide(color: isSelected ? AppTheme.peachAccent : Colors.transparent, width: 3)),
                 ),
-                child: Center(
-                  child: Text(
-                    filter,
-                    style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+                child: Text(
+                  filter,
+                  style: TextStyle(
+                    color: isSelected ? AppTheme.peachAccent : Colors.grey, 
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600, 
+                    fontSize: 15
                   ),
                 ),
               ),
@@ -249,103 +221,87 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
             BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 8))
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: typeColor.withOpacity(0.2), width: 2),
-                  image: DecorationImage(
-                    image: NetworkImage('https://i.pravatar.cc/150?u=${request.studentId}'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: typeColor, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
-                    child: Icon(typeIcon, color: Colors.white, size: 12),
-                  ),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: typeColor.withOpacity(0.2), width: 2),
+                image: DecorationImage(
+                  image: NetworkImage('https://i.pravatar.cc/150?u=${request.studentId}'),
+                  fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(request.studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryText)),
-                    const SizedBox(height: 4),
-                    Text('${request.type.name.toUpperCase()} • ${request.studentId}', style: const TextStyle(color: AppTheme.secondaryText, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
-                  ],
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(color: typeColor, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                  child: Icon(typeIcon, color: Colors.white, size: 10),
                 ),
               ),
-              if (!isPending)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: request.status == RequestStatus.accepted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    request.status.name.toUpperCase(),
-                    style: TextStyle(color: request.status == RequestStatus.accepted ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(request.description, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14, height: 1.5)),
-          if (isPending) ...[
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() => request.status = RequestStatus.rejected);
-                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.red.withOpacity(0.2)),
-                      ),
-                      child: const Center(child: Text('Decline', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(request.studentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
+                  const SizedBox(height: 4),
+                  Text('${request.type.name.toUpperCase()} • ${request.studentId}', style: const TextStyle(color: AppTheme.secondaryText, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                  const SizedBox(height: 8),
+                  Text(request.description, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, height: 1.4)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            if (isPending)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
                     onTap: () {
                       setState(() => request.status = RequestStatus.accepted);
                       globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))],
-                      ),
-                      child: const Center(child: Text('Approve', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+                      child: const Icon(Icons.check_rounded, color: Colors.green, size: 20),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() => request.status = RequestStatus.rejected);
+                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
+                      child: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
+                    ),
+                  ),
+                ],
+              )
+            else
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: request.status == RequestStatus.accepted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
-            ),
+                child: Text(
+                  request.status.name.toUpperCase(),
+                  style: TextStyle(color: request.status == RequestStatus.accepted ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+              ),
           ],
-        ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

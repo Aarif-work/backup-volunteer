@@ -17,12 +17,14 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildSliverAppBar(context),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundColor,
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            _buildSliverAppBar(context),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 10.0),
@@ -30,20 +32,20 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildWelcomeSection(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
                   _buildAppModules(context),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 16),
                   _buildStudentAlerts(context),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 16),
                   _buildRecentNotifications(context),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildSliverAppBar(BuildContext context) {
@@ -138,18 +140,13 @@ class DashboardScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'MAIN MENU', 
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)
-        ),
-        const SizedBox(height: 16),
         GridView.count(
           crossAxisCount: 3,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 0.9,
+          childAspectRatio: 0.95,
           children: [
             _buildMenuTile(context, 'Requests', Icons.pending_actions_rounded, AppTheme.lavenderGradient, () {
                if (onNavigate != null) onNavigate!(1);

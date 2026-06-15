@@ -43,18 +43,9 @@ class _MainNavigationContainerState extends State<MainNavigationContainer> {
       },
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        body: GestureDetector(
-          onVerticalDragEnd: (details) {
-            if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
-               if (_currentIndex != 0) {
-                 setState(() => _currentIndex = 0);
-               }
-            }
-          },
-          child: IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
         ),
         bottomNavigationBar: _buildPremiumNavBar(),
       ),

@@ -355,8 +355,6 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
   final _amountController = TextEditingController();
   ExpenseCategory _category = ExpenseCategory.snacks;
   DateTime _selectedDate = DateTime.now();
-  bool _isReimbursable = true;
-  bool _isPrivate = false;
   XFile? _pickedImage;
   final ImagePicker _picker = ImagePicker();
 
@@ -385,10 +383,10 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppTheme.primaryColor,
               onPrimary: Colors.white,
-              onSurface: AppTheme.textPrimary,
+              onSurface: AppTheme.primaryText,
             ),
           ),
           child: child!,
@@ -405,80 +403,94 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        color: AppTheme.backgroundColor,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
       ),
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Add Financial Record', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+              const Text(
+                'Add Record', 
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryText)
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: AppTheme.secondaryText), 
+                onPressed: () => Navigator.pop(context),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
-          TextField(
+          const SizedBox(height: 32),
+
+          // Title / Description
+          _buildFriendlyTextField(
             controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Title / Description', hintText: 'e.g. Bulk Stationary for Unit B'),
+            label: 'Description',
+            hint: 'e.g. Bulk Stationary for Unit B',
+            icon: Icons.edit_note_rounded,
           ),
           const SizedBox(height: 20),
+
+          // Amount and Category
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: _buildFriendlyTextField(
                   controller: _amountController,
+                  label: 'Amount',
+                  hint: '0.00',
+                  icon: Icons.currency_rupee_rounded,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Amount', prefixText: '₹ '),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
-                child: DropdownButtonFormField<ExpenseCategory>(
-                  value: _category,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                  items: ExpenseCategory.values.map((c) => DropdownMenuItem(value: c, child: Text(c.name, style: const TextStyle(fontSize: 12)))).toList(),
-                  onChanged: (v) => setState(() => _category = v!),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Category', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.secondaryText)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1.5),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2))],
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<ExpenseCategory>(
+                          value: _category,
+                          isExpanded: true,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.secondaryText),
+                          items: ExpenseCategory.values.map((c) => DropdownMenuItem(
+                            value: c, 
+                            child: Text(c.name.toUpperCase(), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
+                          )).toList(),
+                          onChanged: (v) => setState(() => _category = v!),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text('VISIBILITY & PRIVACY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: SwitchListTile(
-                  title: const Text('Private Storage', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Only visible to you', style: TextStyle(fontSize: 11)),
-                  value: _isPrivate,
-                  onChanged: (v) => setState(() => _isPrivate = v),
-                  activeColor: AppTheme.primaryColor,
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const Text('PAYMENT DETAILS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildPaymentTypeOption('REFUND REQUEST', true),
-              const SizedBox(width: 12),
-              _buildPaymentTypeOption('FOUNDATION PAID', false),
-            ],
-          ),
-          const SizedBox(height: 24),
+          
+          const SizedBox(height: 32),
           _buildAttachmentHub(),
+          
           const Spacer(),
-          ElevatedButton(
-            onPressed: () {
+          
+          // Save Button
+          GestureDetector(
+            onTap: () {
               if (_titleController.text.isNotEmpty && _amountController.text.isNotEmpty) {
                  final amount = double.tryParse(_amountController.text) ?? 0.0;
                  final newExp = ExpenseRecord(
@@ -488,47 +500,67 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                    category: _category,
                    amount: amount,
                    date: _selectedDate,
-                   refundRequested: _isReimbursable,
+                   refundRequested: true,
                    status: ApprovalStatus.pending,
-                   isPrivate: _isPrivate,
-                   isFoundationPaid: !_isReimbursable,
+                   isPrivate: false,
+                   isFoundationPaid: false,
                  );
                  widget.onSubmitted(newExp);
                  Navigator.pop(context);
               }
             },
-            child: const Text('SAVE RECORD'),
+            child: Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [BoxShadow(color: AppTheme.primaryColor.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4))],
+              ),
+              child: const Center(
+                child: Text('SAVE RECORD', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1.0)),
+              ),
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  Widget _buildPaymentTypeOption(String label, bool value) {
-    bool isSelected = _isReimbursable == value;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _isReimbursable = value),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+  Widget _buildFriendlyTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextInputType? keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.secondaryText)),
+        const SizedBox(height: 8),
+        Container(
           decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : Colors.white,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isSelected ? AppTheme.primaryColor : Colors.grey[200]!),
+            border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1.5),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2))],
           ),
-          child: Center(
-            child: Text(
-              label, 
-              style: TextStyle(
-                fontWeight: FontWeight.bold, 
-                fontSize: 11, 
-                color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary
-              )
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            style: const TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w600),
+            decoration: InputDecoration(
+              prefixIcon: Icon(icon, color: AppTheme.secondaryText, size: 20),
+              hintText: hint,
+              hintStyle: TextStyle(color: AppTheme.secondaryText.withOpacity(0.5), fontSize: 14),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -536,8 +568,8 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('PROOF OF EXPENSE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-        const SizedBox(height: 12),
+        const Text('PROOF OF EXPENSE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.0)),
+        const SizedBox(height: 16),
         if (_pickedImage != null)
           Container(
             width: double.infinity,
@@ -556,7 +588,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
           Row(
             children: [
               _buildAttachmentButton(Icons.camera_alt_outlined, 'Camera', () => _pickImage(ImageSource.camera)),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               _buildAttachmentButton(Icons.photo_library_outlined, 'Gallery', () => _pickImage(ImageSource.gallery)),
             ],
           ),
@@ -570,13 +602,13 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!)),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1.5), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2))]),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: AppTheme.textSecondary, size: 18),
+              Icon(icon, color: AppTheme.secondaryText, size: 20),
               const SizedBox(width: 8),
-              Text(label, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(label, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 14, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
