@@ -145,6 +145,7 @@ class ExpenseRecord {
   final double receivedAmount;
   final bool isPrivate;
   final bool isFoundationPaid;
+  final String submittedBy;
 
   const ExpenseRecord({
     required this.id,
@@ -160,6 +161,7 @@ class ExpenseRecord {
     this.receivedAmount = 0.0,
     this.isPrivate = false,
     this.isFoundationPaid = false,
+    this.submittedBy = 'System Admin',
   });
 
   double get remainingBalance => approvedAmount - receivedAmount;

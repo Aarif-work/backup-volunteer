@@ -40,6 +40,30 @@ class _DonorManagementScreenState extends State<DonorManagementScreen> {
       ],
       notes: 'Interested in sponsoring another student next year.',
     ),
+    DonorProfile(
+      id: 'D003',
+      name: 'Sophia Martinez',
+      contactNumber: '+1 555-0203',
+      email: 'sophia.m@example.com',
+      photoUrl: 'https://i.pravatar.cc/150?img=9',
+      studentIds: ['s5'],
+      donationHistory: [
+        DonationRecord(id: 'dn4', amount: 1000.0, date: DateTime(2024, 2, 28), purpose: 'Library Expansion'),
+      ],
+      notes: 'Wants updates on library construction.',
+    ),
+    DonorProfile(
+      id: 'D004',
+      name: 'William Taylor',
+      contactNumber: '+1 555-0204',
+      email: 'william.t@example.com',
+      photoUrl: 'https://i.pravatar.cc/150?img=14',
+      studentIds: ['s6', 's7'],
+      donationHistory: [
+        DonationRecord(id: 'dn5', amount: 3500.0, date: DateTime(2024, 4, 12), purpose: 'Computer Lab Equipment'),
+      ],
+      notes: 'Invited to the annual technology fair.',
+    ),
   ];
 
   // Helper method to get mock student names
@@ -48,6 +72,9 @@ class _DonorManagementScreenState extends State<DonorManagementScreen> {
     if (id == 's2') return 'Bob Smith';
     if (id == 's3') return 'Charlie Johnson';
     if (id == 's4') return 'Diana Brown';
+    if (id == 's5') return 'Ethan Davis';
+    if (id == 's6') return 'Fiona Davis';
+    if (id == 's7') return 'George Wilson';
     return 'Unknown Student';
   }
 
@@ -88,44 +115,13 @@ class _DonorManagementScreenState extends State<DonorManagementScreen> {
         backgroundColor: AppTheme.backgroundColor,
         body: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              expandedHeight: 180.0,
-              floating: false,
+            const SliverAppBar(
+              floating: true,
               pinned: true,
-              backgroundColor: AppTheme.backgroundColor,
-              surfaceTintColor: Colors.transparent,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primaryText),
-                onPressed: () => Navigator.pop(context),
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                titlePadding: const EdgeInsets.only(left: 50, bottom: 16),
-                title: const Text(
-                  'Donor Management',
-                  style: TextStyle(color: AppTheme.primaryText, fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                background: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        AppTheme.peachAccent.withOpacity(0.1),
-                        AppTheme.backgroundColor,
-                      ],
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        right: -50,
-                        top: -20,
-                        child: Icon(Icons.volunteer_activism_rounded, size: 200, color: AppTheme.peachAccent.withOpacity(0.05)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              backgroundColor: Color(0xFFF8F9FA),
+              elevation: 0,
+              iconTheme: IconThemeData(color: Colors.black),
+              title: Text('Donor Management', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
             ),
             SliverToBoxAdapter(
               child: Padding(

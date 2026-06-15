@@ -11,70 +11,18 @@ class ReportCenterScreen extends StatelessWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            expandedHeight: 180.0,
-            floating: false,
+          const SliverAppBar(
+            floating: true,
             pinned: true,
-            backgroundColor: const Color(0xFF000000),
+            backgroundColor: Color(0xFFF8F9FA),
             elevation: 0,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-              onPressed: () => Navigator.pop(context),
-            ),
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
-                return FlexibleSpaceBar(
-                  centerTitle: true,
-                  titlePadding: const EdgeInsets.only(bottom: 14),
-                  title: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: collapsed ? 1.0 : 0.0,
-                    child: const Text('REPORT CENTER',
-                      style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
-                  ),
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: AppTheme.headerGradient,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 50,
-                          right: -30,
-                          child: Icon(Icons.analytics_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-                        ),
-                        SafeArea(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Data Hub',
-                                  style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
-                                const SizedBox(height: 4),
-                                const Text('Report Center',
-                                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 8),
-                                const Text('Download and share foundation mission reports.',
-                                  style: TextStyle(color: Colors.white70, fontSize: 12)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+            iconTheme: IconThemeData(color: Colors.black),
+            title: Text('Report Center', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Text('Download and share foundation mission reports.', style: TextStyle(color: AppTheme.secondaryText, fontSize: 14)),
             ),
           ),
           SliverPadding(

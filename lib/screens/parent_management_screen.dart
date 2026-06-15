@@ -43,6 +43,24 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
       studentIds: ['s4'],
       activityHistory: [],
     ),
+    ParentProfile(
+      id: 'p4',
+      name: 'Emily Davis',
+      contactNumber: '+1 555-0104',
+      email: 'emily.davis@example.com',
+      address: '321 Maple St, Springfield',
+      studentIds: ['s5', 's6'],
+      activityHistory: ['Requested medical leave'],
+    ),
+    ParentProfile(
+      id: 'p5',
+      name: 'James Wilson',
+      contactNumber: '+1 555-0105',
+      email: 'james.wilson@example.com',
+      address: '654 Elm St, Springfield',
+      studentIds: ['s7'],
+      activityHistory: ['Attended annual day'],
+    ),
   ];
 
   // Helper method to get mock student names
@@ -51,6 +69,9 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
     if (id == 's2') return 'Bob Smith';
     if (id == 's3') return 'Charlie Johnson';
     if (id == 's4') return 'Diana Brown';
+    if (id == 's5') return 'Ethan Davis';
+    if (id == 's6') return 'Fiona Davis';
+    if (id == 's7') return 'George Wilson';
     return 'Unknown Student';
   }
 
@@ -93,45 +114,14 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
         backgroundColor: AppTheme.backgroundColor,
         body: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              expandedHeight: 180.0,
-              floating: false,
+            const SliverAppBar(
+              floating: true,
               pinned: true,
-              backgroundColor: AppTheme.backgroundColor,
-            surfaceTintColor: Colors.transparent,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.primaryText),
-              onPressed: () => Navigator.pop(context),
+              backgroundColor: Color(0xFFF8F9FA),
+              elevation: 0,
+              iconTheme: IconThemeData(color: Colors.black),
+              title: Text('Parent Management', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
             ),
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 50, bottom: 16),
-              title: const Text(
-                'Parent Management',
-                style: TextStyle(color: AppTheme.primaryText, fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppTheme.lavenderAccent.withOpacity(0.1),
-                      AppTheme.backgroundColor,
-                    ],
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      right: -50,
-                      top: -20,
-                      child: Icon(Icons.family_restroom_rounded, size: 200, color: AppTheme.lavenderAccent.withOpacity(0.05)),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),

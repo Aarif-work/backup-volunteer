@@ -389,17 +389,6 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
                             style: TextStyle(color: Colors.red.shade900, fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            minimumSize: Size.zero,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text('Contact', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
-                        )
                       ],
                     ),
                   ),

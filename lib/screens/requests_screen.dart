@@ -264,18 +264,6 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
                 children: [
                   GestureDetector(
                     onTap: () {
-                      setState(() => request.status = RequestStatus.accepted);
-                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
-                      child: const Icon(Icons.check_rounded, color: Colors.green, size: 20),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
                       setState(() => request.status = RequestStatus.rejected);
                       globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
                     },
@@ -283,6 +271,18 @@ class _RequestsScreenState extends State<RequestsScreen> with SingleTickerProvid
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
                       child: const Icon(Icons.close_rounded, color: Colors.red, size: 20),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() => request.status = RequestStatus.accepted);
+                      globalPendingRequestsCount.value = _requests.where((r) => r.status == RequestStatus.pending).length;
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), shape: BoxShape.circle),
+                      child: const Icon(Icons.check_rounded, color: Colors.green, size: 20),
                     ),
                   ),
                 ],

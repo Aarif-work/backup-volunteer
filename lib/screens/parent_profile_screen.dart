@@ -139,10 +139,9 @@ class ParentProfileScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(gradient: AppTheme.peachGradient, shape: BoxShape.circle),
-              child: const Icon(Icons.school_rounded, color: AppTheme.peachAccent, size: 18),
+            CircleAvatar(
+              radius: 18,
+              backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=$studentId'),
             ),
             const SizedBox(width: 12),
             Expanded(

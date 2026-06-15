@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/app_models.dart';
@@ -12,7 +13,7 @@ class ExpenseCenterScreen extends StatefulWidget {
 }
 
 class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
-  ApprovalStatus? _filterStatus;
+  String _selectedAdminFilter = 'All Records';
   final ScrollController _scrollController = ScrollController();
   
   final List<ExpenseRecord> _expenses = [
@@ -33,10 +34,11 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
       title: 'Diesel for Logistics',
       description: 'Used for transport truck.',
       category: ExpenseCategory.travel,
-      amount: 1800.0,
+      amount: 180000.0,
       date: DateTime.now().subtract(const Duration(days: 2)),
       status: ApprovalStatus.pending,
       refundRequested: true,
+      submittedBy: 'Admin Assistant',
     ),
     ExpenseRecord(
       id: '3',
@@ -61,12 +63,32 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
   double get _totalFoundationSpend => _expenses
       .fold(0, (sum, item) => sum + item.amount);
 
+  String _formatDate(DateTime date) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  String _formatCurrency(double amount) {
+    String numStr = amount.truncate().toString();
+    if (numStr.length <= 3) return numStr;
+    String result = numStr.substring(numStr.length - 3);
+    numStr = numStr.substring(0, numStr.length - 3);
+    while (numStr.length > 2) {
+      result = numStr.substring(numStr.length - 2) + ',' + result;
+      numStr = numStr.substring(0, numStr.length - 2);
+    }
+    if (numStr.isNotEmpty) {
+      result = numStr + ',' + result;
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<ExpenseRecord> filteredExpenses = _expenses;
-    if (_filterStatus != null) {
-      filteredExpenses = _expenses.where((e) => e.status == _filterStatus).toList();
-    }
+    List<ExpenseRecord> filteredExpenses = _expenses.where((e) {
+      if (_selectedAdminFilter == 'All Records') return true;
+      return e.submittedBy == 'System Admin';
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -77,7 +99,7 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
           _buildSliverHeader(),
           _buildStatsSection(),
           const SliverToBoxAdapter(child: SizedBox(height: 10)),
-          _buildStatusFilter(),
+          _buildAdminFilter(),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -122,59 +144,28 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Available for Refund', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.w600)),
+                const Text('Total Spend', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     const Text('₹', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
                     const SizedBox(width: 4),
-                    Text(_totalRemainingRefund.toStringAsFixed(0), style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
+                    Text(_formatCurrency(_totalFoundationSpend), style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
                   ],
                 ),
               ],
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.orangeAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.pending_actions_rounded, color: Colors.orange, size: 14),
-                      const SizedBox(width: 6),
-                      Text('Wait: ₹${_totalRequestedRefund.toStringAsFixed(0)}', style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.fact_check_rounded, color: Colors.blue, size: 14),
-                      const SizedBox(width: 6),
-                      Text('Paid: ₹${_totalFoundationSpend.toStringAsFixed(0)}', style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatusFilter() {
+
+
+  Widget _buildAdminFilter() {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 50,
@@ -183,20 +174,18 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 24),
           children: [
-            _buildFilterChip('All Records', null),
-            _buildFilterChip('Pending', ApprovalStatus.pending),
-            _buildFilterChip('Approved', ApprovalStatus.approved),
-            _buildFilterChip('Rejected', ApprovalStatus.rejected),
+            _buildAdminFilterChip('All Records'),
+            _buildAdminFilterChip('My Records'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, ApprovalStatus? status) {
-    bool isSelected = _filterStatus == status;
+  Widget _buildAdminFilterChip(String label) {
+    bool isSelected = _selectedAdminFilter == label;
     return GestureDetector(
-      onTap: () => setState(() => _filterStatus = status),
+      onTap: () => setState(() => _selectedAdminFilter = label),
       child: Container(
         margin: const EdgeInsets.only(right: 20),
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -251,32 +240,20 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${expense.date.day}/${expense.date.month} • ${expense.category.name.toUpperCase()}', 
+                  '${_formatDate(expense.date)} • ${expense.category.name.toUpperCase()}', 
                   style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary, fontWeight: FontWeight.w600)
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Submitted by ${expense.submittedBy}', 
+                  style: const TextStyle(fontSize: 11, color: Colors.blueGrey, fontWeight: FontWeight.bold)
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '₹ ${expense.amount.toStringAsFixed(0)}', 
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryText)
-              ),
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  expense.status.name.toUpperCase(), 
-                  style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+          Text(
+            '₹ ${_formatCurrency(expense.amount)}', 
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.primaryText)
           ),
         ],
       ),
@@ -402,9 +379,10 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                 child: _buildFriendlyTextField(
                   controller: _amountController,
                   label: 'Amount',
-                  hint: '0.00',
+                  hint: '0',
                   icon: Icons.currency_rupee_rounded,
                   keyboardType: TextInputType.number,
+                  inputFormatters: [IndianCurrencyFormatter()],
                 ),
               ),
               const SizedBox(width: 16),
@@ -450,7 +428,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
           GestureDetector(
             onTap: () {
               if (_titleController.text.isNotEmpty && _amountController.text.isNotEmpty) {
-                 final amount = double.tryParse(_amountController.text) ?? 0.0;
+                 final amount = double.tryParse(_amountController.text.replaceAll(',', '')) ?? 0.0;
                  final newExp = ExpenseRecord(
                    id: DateTime.now().toString(),
                    title: _titleController.text,
@@ -492,6 +470,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
     required String hint,
     required IconData icon,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,6 +487,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             style: const TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: AppTheme.secondaryText, size: 20),
@@ -571,6 +551,41 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class IndianCurrencyFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    String numStr = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (numStr.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+
+    String result = '';
+    String temp = numStr;
+    if (temp.length <= 3) {
+      result = temp;
+    } else {
+      result = temp.substring(temp.length - 3);
+      temp = temp.substring(0, temp.length - 3);
+      while (temp.length > 2) {
+        result = temp.substring(temp.length - 2) + ',' + result;
+        temp = temp.substring(0, temp.length - 2);
+      }
+      if (temp.isNotEmpty) {
+        result = temp + ',' + result;
+      }
+    }
+
+    return TextEditingValue(
+      text: result,
+      selection: TextSelection.collapsed(offset: result.length),
     );
   }
 }

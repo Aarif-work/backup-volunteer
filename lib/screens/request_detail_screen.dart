@@ -12,6 +12,16 @@ class RequestDetailScreen extends StatelessWidget {
     required this.onAction,
   });
 
+  String _formatDateTime(DateTime date) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    int hour = date.hour;
+    String amPm = hour >= 12 ? 'PM' : 'AM';
+    if (hour > 12) hour -= 12;
+    if (hour == 0) hour = 12;
+    String minute = date.minute.toString().padLeft(2, '0');
+    return '${date.day} ${months[date.month - 1]} ${date.year} • $hour:$minute $amPm';
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isPending = request.status == RequestStatus.pending;
@@ -34,7 +44,7 @@ class RequestDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStudentHeader(),
+              _buildStudentHeader(context),
               const SizedBox(height: 32),
               _buildDetailsCard(),
               const SizedBox(height: 24),
@@ -48,7 +58,7 @@ class RequestDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStudentHeader() {
+  Widget _buildStudentHeader(BuildContext context) {
     return Row(
       children: [
         CircleAvatar(
@@ -71,7 +81,7 @@ class RequestDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '20 May 2025 • 10:30 AM', // In a real app, use request.date
+                _formatDateTime(request.date),
                 style: const TextStyle(fontSize: 12, color: AppTheme.secondaryText),
               ),
             ],
@@ -80,12 +90,24 @@ class RequestDetailScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
+            color: request.status == RequestStatus.pending
+                ? Colors.orange.withOpacity(0.1)
+                : request.status == RequestStatus.accepted
+                    ? Colors.green.withOpacity(0.1)
+                    : Colors.red.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Text(
-            'Pending',
-            style: TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
+          child: Text(
+            request.status.name.toUpperCase(),
+            style: TextStyle(
+              color: request.status == RequestStatus.pending
+                  ? Colors.orange
+                  : request.status == RequestStatus.accepted
+                      ? Colors.green
+                      : Colors.red,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -203,6 +225,7 @@ class RequestDetailScreen extends StatelessWidget {
     );
   }
 
+
   Widget _buildBottomActions(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -213,30 +236,14 @@ class RequestDetailScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                request.status = RequestStatus.accepted;
-                onAction();
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00C853),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                elevation: 0,
-              ),
-              child: const Text('Approve', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: ElevatedButton(
+            child: ElevatedButton.icon(
               onPressed: () {
                 request.status = RequestStatus.rejected;
                 onAction();
                 Navigator.pop(context);
               },
+              icon: const Icon(Icons.close_rounded, size: 18),
+              label: const Text('Reject', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFF5252),
                 foregroundColor: Colors.white,
@@ -244,7 +251,25 @@ class RequestDetailScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
-              child: const Text('Reject', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () {
+                request.status = RequestStatus.accepted;
+                onAction();
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.check_rounded, size: 18),
+              label: const Text('Approve', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00C853),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 0,
+              ),
             ),
           ),
         ],
