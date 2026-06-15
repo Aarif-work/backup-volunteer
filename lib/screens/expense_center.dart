@@ -75,9 +75,10 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildSliverHeader(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          _buildStatsSection(),
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
           _buildStatusFilter(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -101,117 +102,75 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
 
   Widget _buildSliverHeader() {
     return SliverAppBar(
-      expandedHeight: 220.0,
-      floating: false,
+      floating: true,
       pinned: true,
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: const Color(0xFFF8F9FA),
       elevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-      ),
-      flexibleSpace: LayoutBuilder(
-        builder: (context, constraints) {
-          final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
-          return FlexibleSpaceBar(
-            centerTitle: true,
-            titlePadding: const EdgeInsets.only(bottom: 14),
-            title: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: collapsed ? 1.0 : 0.0,
-              child: const Text('FINANCE CENTER',
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
-            ),
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: AppTheme.headerGradient,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 50,
-                    right: -30,
-                    child: Icon(Icons.account_balance_wallet_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-                  ),
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Finance Center',
-                                style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 1.5),
-                              ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.description_outlined, color: Colors.white70, size: 20),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Generating PDF Report...')));
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.download_rounded, color: Colors.white70, size: 20),
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Excel Spreadsheet Exported')));
-                                    },
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          Text(
-                            '₹ ${_totalRemainingRefund.toStringAsFixed(0)}',
-                            style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text('Available for Refund', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              _buildHeaderStat('Waiting', '₹ ${_totalRequestedRefund.toStringAsFixed(0)}', Icons.pending_actions_rounded, Colors.orangeAccent),
-                              const SizedBox(width: 24),
-                              _buildHeaderStat('Recorded', '₹ ${_totalFoundationSpend.toStringAsFixed(0)}', Icons.fact_check_rounded, Colors.blueAccent),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      iconTheme: const IconThemeData(color: Colors.black),
+      title: const Text('Finance Center', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
     );
   }
 
-  Widget _buildHeaderStat(String label, String value, IconData icon, Color color) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildStatsSection() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Available for Refund', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text('₹', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
+                    const SizedBox(width: 4),
+                    Text(_totalRemainingRefund.toStringAsFixed(0), style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
+                  ],
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.orangeAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.pending_actions_rounded, color: Colors.orange, size: 14),
+                      const SizedBox(width: 6),
+                      Text('Wait: ₹${_totalRequestedRefund.toStringAsFixed(0)}', style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.fact_check_rounded, color: Colors.blue, size: 14),
+                      const SizedBox(width: 6),
+                      Text('Paid: ₹${_totalFoundationSpend.toStringAsFixed(0)}', style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
@@ -239,18 +198,17 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
     return GestureDetector(
       onTap: () => setState(() => _filterStatus = status),
       child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        margin: const EdgeInsets.only(right: 20),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.black : Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))] : [],
+          border: Border(bottom: BorderSide(color: isSelected ? AppTheme.peachAccent : Colors.transparent, width: 3)),
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppTheme.peachAccent : Colors.grey, 
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600, 
+            fontSize: 15
           ),
         ),
       ),

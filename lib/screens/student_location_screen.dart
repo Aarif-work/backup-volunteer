@@ -87,9 +87,10 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
         physics: const BouncingScrollPhysics(),
         slivers: [
           _buildSliverHeader(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          _buildStatsSection(),
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
           _buildLiveStatusRow(),
-          SliverToBoxAdapter(child: const SizedBox(height: 20)),
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -107,91 +108,58 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
 
   Widget _buildSliverHeader() {
     return SliverAppBar(
-      expandedHeight: 180.0,
-      floating: false,
+      floating: true,
       pinned: true,
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: const Color(0xFFF8F9FA),
       elevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-      ),
-      flexibleSpace: LayoutBuilder(
-        builder: (context, constraints) {
-          final collapsed = constraints.maxHeight <= kToolbarHeight + MediaQuery.of(context).padding.top + 10;
-          return FlexibleSpaceBar(
-            centerTitle: true,
-            titlePadding: const EdgeInsets.only(bottom: 14),
-            title: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: collapsed ? 1.0 : 0.0,
-              child: const Text('STUDENT RADAR',
-                style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1.0)),
-            ),
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: AppTheme.headerGradient,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                ),
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 50,
-                    right: -30,
-                    child: Icon(Icons.radar_rounded, size: 200, color: Colors.white.withOpacity(0.05)),
-                  ),
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text('Live Radar',
-                            style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
-                          const SizedBox(height: 4),
-                          const Text('Student Monitoring',
-                            style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              _buildHeaderStat('Actively Tracked', '4', Icons.my_location_rounded, Colors.greenAccent),
-                              const SizedBox(width: 24),
-                              _buildHeaderStat('Critical Alerts', '2', Icons.warning_amber_rounded, Colors.redAccent),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      iconTheme: const IconThemeData(color: Colors.black),
+      title: const Text('Student Radar', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
     );
   }
 
-  Widget _buildHeaderStat(String label, String value, IconData icon, Color color) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildStatsSection() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Actively Tracked', style: TextStyle(color: AppTheme.secondaryText, fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text('4', style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primaryText, height: 1.0)),
+                    const SizedBox(width: 8),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 6),
+                      child: Text('students', style: TextStyle(fontSize: 14, color: AppTheme.secondaryText, fontWeight: FontWeight.w500)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 16),
+                  const SizedBox(width: 8),
+                  const Text('2 Alerts', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
+                ],
+              ),
+            ),
           ],
-        )
-      ],
+        ),
+      ),
     );
   }
 
@@ -224,18 +192,17 @@ class _StudentLocationScreenState extends State<StudentLocationScreen> with Sing
         });
       },
       child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        margin: const EdgeInsets.only(right: 20),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.black : Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
-          boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))] : [],
+          border: Border(bottom: BorderSide(color: isSelected ? AppTheme.peachAccent : Colors.transparent, width: 3)),
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 13),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppTheme.peachAccent : Colors.grey, 
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600, 
+            fontSize: 15
           ),
         ),
       ),

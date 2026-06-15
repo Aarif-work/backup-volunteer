@@ -9,79 +9,43 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F2F5),
+      backgroundColor: const Color(0xFFF8F9FA),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar(
-            expandedHeight: 220.0,
-            floating: false,
+          const SliverAppBar(
+            floating: true,
             pinned: true,
             automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFF000000),
+            backgroundColor: Color(0xFFF8F9FA),
             elevation: 0,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-            ),
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final collapsed = constraints.maxHeight <=
-                    kToolbarHeight + MediaQuery.of(context).padding.top + 10;
-                return FlexibleSpaceBar(
-                  centerTitle: true,
-                  titlePadding: const EdgeInsets.only(bottom: 14),
-                  title: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 200),
-                    opacity: collapsed ? 1.0 : 0.0,
-                    child: const Text(
-                      'MY PROFILE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2),
+            iconTheme: IconThemeData(color: Colors.black),
+            title: Text('My Profile', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white, 
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 5))],
+                    ),
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey.shade100,
+                      backgroundImage: const NetworkImage('https://i.pravatar.cc/300?img=11'),
                     ),
                   ),
-                  background: Container(
-                    decoration:
-                        const BoxDecoration(gradient: AppTheme.headerGradient),
-                    child: SafeArea(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                                color: Colors.white, shape: BoxShape.circle),
-                            child: CircleAvatar(
-                              radius: 46,
-                              backgroundColor: Colors.grey.shade100,
-                              backgroundImage: const NetworkImage(
-                                  'https://i.pravatar.cc/300?img=11'),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'John Volunteer',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          const Text(
-                            'ID: HOPE3-2024-089',
-                            style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  const SizedBox(height: 16),
+                  const Text('John Volunteer', style: TextStyle(color: AppTheme.primaryText, fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  const Text('ID: HOPE3-2024-089', style: TextStyle(color: AppTheme.secondaryText, fontSize: 14, fontWeight: FontWeight.w500)),
+                ],
+              ),
             ),
           ),
           SliverPadding(
