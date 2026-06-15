@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/app_models.dart';
 import 'student_directory_screen.dart';
+import 'parent_profile_screen.dart';
 
 class ParentManagementScreen extends StatefulWidget {
   const ParentManagementScreen({super.key});
@@ -78,14 +79,7 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
     super.dispose();
   }
 
-  void _showParentDetails(BuildContext context, ParentProfile parent) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => ParentDetailBottomSheet(parent: parent, getStudentName: _getStudentName),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +176,12 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
 
   Widget _buildParentCard(ParentProfile parent) {
     return GestureDetector(
-      onTap: () => _showParentDetails(context, parent),
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => ParentProfileScreen(
+          parent: parent,
+          getStudentName: _getStudentName,
+        )));
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
@@ -193,197 +192,85 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
             BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
           ],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                gradient: AppTheme.lavenderGradient,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.person_rounded, color: AppTheme.lavenderAccent),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(parent.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
-                  const SizedBox(height: 4),
-                  Row(
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: const BoxDecoration(
+                    gradient: AppTheme.lavenderGradient,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.person_rounded, color: AppTheme.lavenderAccent),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.phone_rounded, size: 14, color: AppTheme.secondaryText),
-                      const SizedBox(width: 4),
-                      Text(parent.contactNumber, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
+                      Text(parent.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone_rounded, size: 14, color: AppTheme.secondaryText),
+                          const SizedBox(width: 4),
+                          Text(parent.contactNumber, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.mintAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${parent.studentIds.length} Student${parent.studentIds.length > 1 ? 's' : ''}',
+                    style: const TextStyle(color: AppTheme.mintAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppTheme.mintAccent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                '${parent.studentIds.length} Student${parent.studentIds.length > 1 ? 's' : ''}',
-                style: const TextStyle(color: AppTheme.mintAccent, fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ParentDetailBottomSheet extends StatelessWidget {
-  final ParentProfile parent;
-  final String Function(String) getStudentName;
-
-  const ParentDetailBottomSheet({required this.parent, required this.getStudentName});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragEnd: (details) {
-        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
-          Navigator.maybePop(context);
-        }
-      },
-      child: Container(
-      decoration: const BoxDecoration(
-        color: AppTheme.backgroundColor,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      padding: const EdgeInsets.all(24).copyWith(bottom: MediaQuery.of(context).padding.bottom + 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(gradient: AppTheme.lavenderGradient, shape: BoxShape.circle),
-                child: const Icon(Icons.person_rounded, color: AppTheme.lavenderAccent, size: 32),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(parent.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
-                    const SizedBox(height: 4),
-                    Text('Parent ID: ${parent.id}', style: const TextStyle(fontSize: 14, color: AppTheme.secondaryText)),
-                  ],
+            if (parent.studentIds.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Divider(color: Color(0xFFEEEEEE)),
+              const SizedBox(height: 12),
+              const Text('LINKED STUDENTS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.0)),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 36,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: parent.studentIds.length,
+                  itemBuilder: (context, idx) {
+                    final sId = parent.studentIds[idx];
+                    return Container(
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4, left: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.backgroundColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(radius: 14, backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=$sId')),
+                          const SizedBox(width: 8),
+                          Text(_getStudentName(sId), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 32),
-          const Text('CONTACT INFORMATION', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
-          const SizedBox(height: 16),
-          _buildInfoRow(Icons.phone_rounded, 'Phone', parent.contactNumber),
-          const SizedBox(height: 12),
-          _buildInfoRow(Icons.email_rounded, 'Email', parent.email),
-          const SizedBox(height: 12),
-          _buildInfoRow(Icons.location_on_rounded, 'Address', parent.address),
-          const SizedBox(height: 32),
-          const Text('LINKED STUDENTS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
-          const SizedBox(height: 16),
-          ...parent.studentIds.map((id) => _buildStudentCard(id, context)),
-           const SizedBox(height: 32),
-          if (parent.activityHistory.isNotEmpty) ...[
-            const Text('ACTIVITY HISTORY', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.5)),
-            const SizedBox(height: 16),
-            ...parent.activityHistory.map((activity) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.history_rounded, size: 16, color: AppTheme.secondaryText),
-                  const SizedBox(width: 8),
-                  Text(activity, style: const TextStyle(color: AppTheme.primaryText, fontSize: 14)),
-                ],
-              ),
-            )),
-          ]
-        ],
-      ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
-          child: Icon(icon, size: 18, color: AppTheme.secondaryText),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.secondaryText)),
-            Text(value, style: const TextStyle(fontSize: 14, color: AppTheme.primaryText, fontWeight: FontWeight.w500)),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildStudentCard(String studentId, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Push the actual student screen
-        // But to avoid infinite loop, we can just push. If they click parent from there, it will pop.
-        final mockStudent = StudentProfile(
-          id: studentId,
-          name: getStudentName(studentId),
-          rollNumber: '2024-X-xx',
-          className: 'RCD X',
-          photoUrl: '',
-        );
-        Navigator.push(context, MaterialPageRoute(builder: (_) => StudentProfileDetailScreen(
-          student: mockStudent, 
-          bgColor: const Color(0xFFBCE1EB),
-          isFromParent: true,
-        )));
-      },
-      child: Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(gradient: AppTheme.peachGradient, shape: BoxShape.circle),
-            child: const Icon(Icons.school_rounded, color: AppTheme.peachAccent, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(getStudentName(studentId), style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
-                Text('ID: $studentId', style: const TextStyle(fontSize: 12, color: AppTheme.secondaryText)),
-              ],
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppTheme.secondaryText),
-        ],
-      ),
       ),
     );
   }

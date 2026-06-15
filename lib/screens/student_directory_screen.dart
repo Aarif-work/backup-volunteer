@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/app_models.dart';
 import '../theme/app_theme.dart';
-import 'parent_management_screen.dart';
+import 'parent_profile_screen.dart';
 
 class StudentDirectoryScreen extends StatefulWidget {
   const StudentDirectoryScreen({super.key});
@@ -320,23 +320,18 @@ class StudentProfileDetailScreen extends StatelessWidget {
         if ((context.widget as dynamic).isFromParent == true) {
            Navigator.maybePop(context);
         } else {
-           showModalBottomSheet(
-             context: context,
-             isScrollControlled: true,
-             backgroundColor: Colors.transparent,
-             builder: (context) => ParentDetailBottomSheet(
-               parent: ParentProfile(
-                 id: 'p1',
-                 name: 'Mr. Kumar (Father)',
-                 contactNumber: '+91 98765 43210',
-                 email: 'kumar@example.com',
-                 address: '123 Main St, Springfield',
-                 studentIds: [student.id],
-                 activityHistory: ['Attended PTA meeting', 'Called regarding leave'],
-               ),
-               getStudentName: (id) => student.name,
+           Navigator.push(context, MaterialPageRoute(builder: (context) => ParentProfileScreen(
+             parent: ParentProfile(
+               id: 'p1',
+               name: 'Mr. Kumar (Father)',
+               contactNumber: '+91 98765 43210',
+               email: 'kumar@example.com',
+               address: '123 Main St, Springfield',
+               studentIds: [student.id],
+               activityHistory: ['Attended PTA meeting', 'Called regarding leave'],
              ),
-           );
+             getStudentName: (id) => student.name,
+           )));
         }
       },
       child: Container(

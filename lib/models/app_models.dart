@@ -185,3 +185,40 @@ class ParentProfile {
     this.activityHistory = const [],
   });
 }
+
+// --- DONOR MODELS ---
+class DonationRecord {
+  final String id;
+  final double amount;
+  final DateTime date;
+  final String purpose;
+
+  const DonationRecord({
+    required this.id,
+    required this.amount,
+    required this.date,
+    required this.purpose,
+  });
+}
+
+class DonorProfile {
+  final String id;
+  final String name;
+  final String contactNumber;
+  final String email;
+  final String photoUrl;
+  final List<String> studentIds;
+  final List<DonationRecord> donationHistory;
+  final String notes;
+
+  const DonorProfile({
+    required this.id,
+    required this.name,
+    required this.contactNumber,
+    required this.email,
+    required this.photoUrl,
+    this.studentIds = const [],
+    this.donationHistory = const [],
+    this.notes = '',
+  });
+}
