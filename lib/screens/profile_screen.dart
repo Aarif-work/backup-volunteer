@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'report_center_screen.dart';
 import 'student_directory_screen.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -68,11 +69,11 @@ class ProfileScreen extends StatelessWidget {
                         color: AppTheme.secondaryText,
                         letterSpacing: 1.5)),
                 const SizedBox(height: 16),
-                _buildSettingRow(Icons.person_outline_rounded, 'Personal Details',
+                _buildSettingRow(context, Icons.person_outline_rounded, 'Personal Details',
                     'Manage your contact info', Colors.blue),
-                _buildSettingRow(Icons.security_rounded, 'Security',
+                _buildSettingRow(context, Icons.security_rounded, 'Security',
                     'Password & biometric login', Colors.orange),
-                _buildSettingRow(Icons.help_outline_rounded, 'Support',
+                _buildSettingRow(context, Icons.help_outline_rounded, 'Support',
                     'Contact foundation admin', Colors.green),
                 const SizedBox(height: 40),
                 _buildLogoutButton(context),
@@ -154,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSettingRow(
-      IconData icon, String title, String subtitle, Color color) {
+      BuildContext context, IconData icon, String title, String subtitle, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -173,7 +174,11 @@ class ProfileScreen extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 12, color: AppTheme.secondaryText)),
         trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('$title - Coming soon!'), behavior: SnackBarBehavior.floating),
+          );
+        },
       ),
     );
   }
@@ -182,7 +187,13 @@ class ProfileScreen extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+        },
         icon: const Icon(Icons.logout_rounded, size: 20),
         label: const Text('LOG OUT',
             style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),

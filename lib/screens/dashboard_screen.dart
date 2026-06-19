@@ -7,7 +7,7 @@ import 'requests_screen.dart';
 import 'student_directory_screen.dart';
 import 'student_location_screen.dart';
 import 'profile_screen.dart';
-import 'parent_management_screen.dart';
+import 'system_users_screen.dart';
 import 'expense_center.dart';
 import 'donor_management_screen.dart';
 
@@ -162,7 +162,8 @@ class DashboardScreen extends StatelessWidget {
                if (onNavigate != null) onNavigate!(3);
                else Navigator.push(context, MaterialPageRoute(builder: (context) => const ExpenseCenterScreen()));
             }),
-            _buildMenuTile(context, 'Parents', Icons.family_restroom_rounded, const LinearGradient(colors: [Color(0xFF89CFF0), Color(0xFFB0DFE5)]), () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ParentManagementScreen()))),
+            if (currentUserRole.value == UserRole.superAdmin)
+              _buildMenuTile(context, 'System Users', Icons.admin_panel_settings_rounded, const LinearGradient(colors: [Color(0xFF89CFF0), Color(0xFFB0DFE5)]), () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SystemUsersScreen()))),
             _buildMenuTile(context, 'Donors', Icons.favorite_rounded, const LinearGradient(colors: [Color(0xFFFFB6C1), Color(0xFFFFC0CB)]), () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DonorManagementScreen()))),
           ],
         ),

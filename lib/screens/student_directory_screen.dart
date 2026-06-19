@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/app_models.dart';
 import '../theme/app_theme.dart';
 import 'parent_profile_screen.dart';
+import 'parent_list_screen.dart';
 
 class StudentDirectoryScreen extends StatefulWidget {
   const StudentDirectoryScreen({super.key});
@@ -13,24 +14,33 @@ class StudentDirectoryScreen extends StatefulWidget {
 class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
   String _selectedFilter = 'All';
   bool _isGridView = true;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   final List<StudentProfile> _students = const [
-    StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'RCD 1', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
-    StudentProfile(id: 'STU042', name: 'Sneha Singh', rollNumber: '2024-A-42', className: 'RCD 2', photoUrl: '', feeHistory: ['Term 1 - Paid', 'Term 2 - Pending']),
-    StudentProfile(id: 'STU088', name: 'Priya Sharma', rollNumber: '2024-B-12', className: 'RCD 1', photoUrl: ''),
-    StudentProfile(id: 'STU099', name: 'Arjun Das', rollNumber: '2024-C-05', className: 'RCD 2', photoUrl: '', achievements: ['Debate Team Lead']),
-    StudentProfile(id: 'STU105', name: 'Vikram Singh', rollNumber: '2024-C-10', className: 'RCD 1', photoUrl: '', feeHistory: ['Term 1 - Paid']),
-    StudentProfile(id: 'STU112', name: 'Ananya Patel', rollNumber: '2024-D-22', className: 'RCD 2', photoUrl: '', achievements: ['Math Olympiad Medalist']),
-    StudentProfile(id: 'STU133', name: 'Neha Gupta', rollNumber: '2024-A-15', className: 'RCD 1', photoUrl: ''),
-    StudentProfile(id: 'STU145', name: 'Karan Malhotra', rollNumber: '2024-B-08', className: 'RCD 2', photoUrl: ''),
+    StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'Primary', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
+    StudentProfile(id: 'STU042', name: 'Sneha Singh', rollNumber: '2024-A-42', className: 'High', photoUrl: '', feeHistory: ['Term 1 - Paid', 'Term 2 - Pending']),
+    StudentProfile(id: 'STU088', name: 'Priya Sharma', rollNumber: '2024-B-12', className: 'Primary', photoUrl: ''),
+    StudentProfile(id: 'STU099', name: 'Arjun Das', rollNumber: '2024-C-05', className: 'Middle', photoUrl: '', achievements: ['Debate Team Lead']),
+    StudentProfile(id: 'STU105', name: 'Vikram Singh', rollNumber: '2024-C-10', className: 'Middle', photoUrl: '', feeHistory: ['Term 1 - Paid']),
+    StudentProfile(id: 'STU112', name: 'Ananya Patel', rollNumber: '2024-D-22', className: 'High', photoUrl: '', achievements: ['Math Olympiad Medalist']),
+    StudentProfile(id: 'STU133', name: 'Neha Gupta', rollNumber: '2024-A-15', className: 'Primary', photoUrl: ''),
+    StudentProfile(id: 'STU145', name: 'Karan Malhotra', rollNumber: '2024-B-08', className: 'High', photoUrl: ''),
   ];
 
   @override
   Widget build(BuildContext context) {
-    List<StudentProfile> _filteredStudents = _students;
-    if (_selectedFilter != 'All') {
-      _filteredStudents = _students.where((s) => s.className == _selectedFilter).toList();
-    }
+    List<StudentProfile> _filteredStudents = _students.where((s) {
+      bool matchesFilter = _selectedFilter == 'All' || s.className == _selectedFilter;
+      bool matchesSearch = s.name.toLowerCase().contains(_searchController.text.toLowerCase()) || 
+                           s.rollNumber.toLowerCase().contains(_searchController.text.toLowerCase());
+      return matchesFilter && matchesSearch;
+    }).toList();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -46,8 +56,17 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ParentListScreen()));
+        },
+        backgroundColor: Colors.black,
+        icon: const Icon(Icons.family_restroom_rounded, color: Colors.white),
+        label: const Text('View Parents', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
       body: Column(
         children: [
+          _buildSearchBar(),
           _buildFilterRow(),
           Expanded(
             child: _isGridView 
@@ -100,35 +119,90 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
                     );
                   },
                 )
-              : ListView.builder(
-                  itemCount: _filteredStudents.length,
-                  itemBuilder: (context, index) {
-                    final student = _filteredStudents[index];
-                    final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
-                    final bgColor = colors[index % colors.length];
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    itemCount: _filteredStudents.length,
+                    itemBuilder: (context, index) {
+                      final student = _filteredStudents[index];
+                      final colors = [const Color(0xFFBCE1EB), const Color(0xFFEEDC9A), const Color(0xFF8CD4CB), const Color(0xFF4AC2E2)];
+                      final bgColor = colors[index % colors.length];
 
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      leading: CircleAvatar(
-                        backgroundColor: bgColor,
-                        backgroundImage: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
-                        radius: 25,
-                      ),
-                      title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                      subtitle: Text('${student.className} • ${student.rollNumber}', style: const TextStyle(color: Colors.grey)),
-                      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
-                    );
-                  },
-                ),
+                      return GestureDetector(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentProfileDetailScreen(student: student, bgColor: bgColor))),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: bgColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                  image: DecorationImage(
+                                    image: NetworkImage('https://i.pravatar.cc/250?u=${student.id}'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)),
+                                    const SizedBox(height: 4),
+                                    Text('${student.className} • ${student.rollNumber}', style: const TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500)),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(color: Colors.grey.shade100, shape: BoxShape.circle),
+                                child: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: TextField(
+          controller: _searchController,
+          onChanged: (value) => setState(() {}),
+          decoration: const InputDecoration(
+            hintText: 'Search students...',
+            border: InputBorder.none,
+            icon: Icon(Icons.search_rounded, color: Colors.grey),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFilterRow() {
-    final filters = ['All', 'RCD 1', 'RCD 2'];
+    final filters = ['All', 'Primary', 'Middle', 'High'];
     return SizedBox(
       height: 55,
       child: ListView.builder(

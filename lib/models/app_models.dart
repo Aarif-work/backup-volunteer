@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 // --- USER & VOLUNTEER MODELS ---
+enum UserRole { superAdmin, admin, finance }
+
+final ValueNotifier<UserRole> currentUserRole = ValueNotifier(UserRole.superAdmin);
+
 enum VolunteerBadge { active, eventLeader }
 
 class AppUser {

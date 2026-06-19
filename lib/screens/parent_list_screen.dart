@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/app_models.dart';
-import 'student_directory_screen.dart';
 import 'parent_profile_screen.dart';
 
-class ParentManagementScreen extends StatefulWidget {
-  const ParentManagementScreen({super.key});
+class ParentListScreen extends StatefulWidget {
+  const ParentListScreen({super.key});
 
   @override
-  State<ParentManagementScreen> createState() => _ParentManagementScreenState();
+  State<ParentListScreen> createState() => _ParentListScreenState();
 }
 
-class _ParentManagementScreenState extends State<ParentManagementScreen> {
+class _ParentListScreenState extends State<ParentListScreen> {
   final TextEditingController _searchController = TextEditingController();
   
-  // Mock Data
   final List<ParentProfile> _allParents = [
     ParentProfile(
       id: 'p1',
@@ -63,7 +61,6 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
     ),
   ];
 
-  // Helper method to get mock student names
   String _getStudentName(String id) {
     if (id == 's1') return 'Alice Smith';
     if (id == 's2') return 'Bob Smith';
@@ -81,15 +78,14 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
   void initState() {
     super.initState();
     _filteredParents = _allParents;
-    _searchController.addListener(_onSearchChanged);
   }
 
-  void _onSearchChanged() {
+  void _onSearchChanged(String value) {
     setState(() {
       _filteredParents = _allParents
           .where((parent) =>
-              parent.name.toLowerCase().contains(_searchController.text.toLowerCase()) ||
-              parent.contactNumber.contains(_searchController.text))
+              parent.name.toLowerCase().contains(value.toLowerCase()) ||
+              parent.contactNumber.contains(value))
           .toList();
     });
   }
@@ -100,28 +96,20 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onVerticalDragEnd: (details) {
-        if (details.primaryVelocity != null && details.primaryVelocity! > 300) {
-          Navigator.maybePop(context);
-        }
-      },
-      child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
-        body: CustomScrollView(
-          slivers: [
-            const SliverAppBar(
-              floating: true,
-              pinned: true,
-              backgroundColor: Color(0xFFF8F9FA),
-              elevation: 0,
-              iconTheme: IconThemeData(color: Colors.black),
-              title: Text('Parent Management', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
-            ),
+    return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          const SliverAppBar(
+            floating: true,
+            pinned: true,
+            backgroundColor: Color(0xFFF8F9FA),
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.black),
+            title: Text('Parents Directory', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22)),
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -136,6 +124,7 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
                 ),
                 child: TextField(
                   controller: _searchController,
+                  onChanged: _onSearchChanged,
                   decoration: const InputDecoration(
                     hintText: 'Search parents by name or contact...',
                     border: InputBorder.none,
@@ -159,7 +148,6 @@ class _ParentManagementScreenState extends State<ParentManagementScreen> {
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
-      ),
       ),
     );
   }

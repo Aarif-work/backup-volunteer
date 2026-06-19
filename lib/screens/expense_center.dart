@@ -86,6 +86,7 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
   @override
   Widget build(BuildContext context) {
     List<ExpenseRecord> filteredExpenses = _expenses.where((e) {
+      if (currentUserRole.value == UserRole.admin) return e.submittedBy == 'System Admin';
       if (_selectedAdminFilter == 'All Records') return true;
       return e.submittedBy == 'System Admin';
     }).toList();
@@ -99,7 +100,7 @@ class _ExpenseCenterScreenState extends State<ExpenseCenterScreen> {
           _buildSliverHeader(),
           _buildStatsSection(),
           const SliverToBoxAdapter(child: SizedBox(height: 10)),
-          _buildAdminFilter(),
+          if (currentUserRole.value != UserRole.admin) _buildAdminFilter(),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
+import '../models/app_models.dart';
 import 'main_navigation.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  UserRole _selectedRole = UserRole.superAdmin;
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
+    currentUserRole.value = _selectedRole;
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainNavigationContainer()));
   }
 
@@ -143,6 +146,41 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      const Text(
+                        'Select Role',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.secondaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1.5),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<UserRole>(
+                            value: _selectedRole,
+                            isExpanded: true,
+                            icon: const Padding(
+                              padding: EdgeInsets.only(right: 16.0),
+                              child: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.secondaryText),
+                            ),
+                            items: const [
+                              DropdownMenuItem(value: UserRole.superAdmin, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Super Admin', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
+                              DropdownMenuItem(value: UserRole.admin, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Admin', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
+                              DropdownMenuItem(value: UserRole.finance, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Finance', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) setState(() => _selectedRole = val);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
                       // Login Button
                       GestureDetector(
