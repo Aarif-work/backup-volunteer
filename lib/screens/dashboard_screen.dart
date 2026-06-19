@@ -10,6 +10,7 @@ import 'profile_screen.dart';
 import 'system_users_screen.dart';
 import 'expense_center.dart';
 import 'donor_management_screen.dart';
+import 'messages_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   final Function(int)? onNavigate;

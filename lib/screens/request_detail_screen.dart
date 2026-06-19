@@ -22,6 +22,11 @@ class RequestDetailScreen extends StatelessWidget {
     return '${date.day} ${months[date.month - 1]} ${date.year} • $hour:$minute $amPm';
   }
 
+  String _formatDateTimeShort(DateTime date) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isPending = request.status == RequestStatus.pending;
@@ -122,38 +127,66 @@ class RequestDetailScreen extends StatelessWidget {
 
     switch (request.type) {
       case RequestType.leave:
+        final r = request as LeaveRequestModel;
         cardTitle = 'Leave Details';
         icon = Icons.calendar_today_rounded;
         color = Colors.orange;
-        details = Row(
+        details = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoItem('From', '22 May 2025'),
-            const SizedBox(width: 40),
-            _buildInfoItem('To', '24 May 2025'),
+            Row(children: [Expanded(child: _buildInfoItem('From', _formatDateTimeShort(r.leaveDate))), Expanded(child: _buildInfoItem('To', _formatDateTimeShort(r.resumeDate)))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Requested By', r.requestedBy)), Expanded(child: _buildInfoItem('Created At', _formatDateTimeShort(r.createdAt)))]),
+            if (r.reviewedBy != null) ...[
+              const SizedBox(height: 16),
+              Row(children: [Expanded(child: _buildInfoItem('Reviewed By', r.reviewedBy!)), Expanded(child: _buildInfoItem('Reviewed At', _formatDateTimeShort(r.reviewedAt!)))]),
+              const SizedBox(height: 16),
+              _buildInfoItem('Review Note', r.reviewNote ?? 'N/A'),
+            ],
           ],
         );
         break;
       case RequestType.fee:
+        final r = request as FeeRequestModel;
         cardTitle = 'Fee Assistance Details';
         icon = Icons.payments_outlined;
         color = Colors.blue;
-        details = Row(
+        details = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoItem('Amount Requested', '₹500'),
-            const SizedBox(width: 40),
-            _buildInfoItem('Category', 'Library Fees'),
+            Row(children: [Expanded(child: _buildInfoItem('Amount Requested', '₹${r.amount}')), Expanded(child: _buildInfoItem('Category', r.feeType))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Course', r.course)), Expanded(child: _buildInfoItem('Payment Mode', r.paymentMode))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Due Date', _formatDateTimeShort(r.dueDate))), Expanded(child: _buildInfoItem('Contact', r.contactNumber))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Email', r.email)), Expanded(child: _buildInfoItem('Requested By', r.requestedBy))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Marksheets', '${r.submittedMarksheets}')), Expanded(child: _buildInfoItem('Receipts', '${r.submittedPaymentReceipts}'))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('HOPE3 ID', r.studentHope3Id)), Expanded(child: _buildInfoItem('Drive Link', r.driveLink))]),
+            if (r.reviewedBy != null) ...[
+              const SizedBox(height: 16),
+              Row(children: [Expanded(child: _buildInfoItem('Reviewed By', r.reviewedBy!)), Expanded(child: _buildInfoItem('Reviewed At', _formatDateTimeShort(r.reviewedAt!)))]),
+            ],
           ],
         );
         break;
       case RequestType.achievement:
+        final r = request as StudentAchievementModel;
         cardTitle = 'Achievement Verification';
         icon = Icons.emoji_events_outlined;
         color = Colors.purple;
-        details = Row(
+        details = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoItem('Category', 'Science Fair'),
-            const SizedBox(width: 40),
-            _buildInfoItem('Position', '1st Place'),
+            Row(children: [Expanded(child: _buildInfoItem('Category', r.achievementType)), Expanded(child: _buildInfoItem('Title', r.title))]),
+            const SizedBox(height: 16),
+            Row(children: [Expanded(child: _buildInfoItem('Submitted At', _formatDateTimeShort(r.submittedAt))), Expanded(child: _buildInfoItem('Drive Link', r.photoDriveLink))]),
+            if (r.reviewedBy != null) ...[
+              const SizedBox(height: 16),
+              Row(children: [Expanded(child: _buildInfoItem('Reviewed By', r.reviewedBy!)), Expanded(child: _buildInfoItem('Reviewed At', _formatDateTimeShort(r.reviewedAt!)))]),
+            ],
           ],
         );
         break;

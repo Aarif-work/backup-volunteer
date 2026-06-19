@@ -42,6 +42,49 @@ class StudentProfile {
   final bool isLocationOff;
   final bool isPermittedToLeave;
 
+  // New Full Schema Fields
+  final String? userId;
+  final DateTime? dateOfBirth;
+  final String? gender;
+  final String? bloodGroup;
+  final String? address;
+  final String? city;
+  final String? state;
+  final String? pincode;
+  final String? emergencyContact;
+  final String? hostelRoom;
+  final String? religion;
+  final String? community;
+
+  // Academic
+  final String? schoolName;
+  final String? course;
+  final String? major;
+  final String? college;
+  final String? year;
+  final String? currentYear;
+  final String? mode;
+  final String? schoolName10th;
+  final String? schoolName12th;
+
+  // Finance
+  final String? bankName;
+  final String? bankAccountNumber;
+  final String? bankIfsc;
+  final String? fundingPercentage;
+  final String? amountApprox;
+
+  // Family
+  final String? fatherName;
+  final String? fatherContactNumber;
+  final String? fatherOccupation;
+  final String? motherName;
+  final String? motherContactNumber;
+  final String? motherOccupation;
+  final String? guardianName;
+  final String? guardianContactNumber;
+  final String? guardianOccupation;
+
   const StudentProfile({
     required this.id,
     required this.name,
@@ -54,6 +97,41 @@ class StudentProfile {
     this.currentLocation = StudentLocation.unknown,
     this.isLocationOff = false,
     this.isPermittedToLeave = true,
+    this.userId,
+    this.dateOfBirth,
+    this.gender,
+    this.bloodGroup,
+    this.address,
+    this.city,
+    this.state,
+    this.pincode,
+    this.emergencyContact,
+    this.hostelRoom,
+    this.religion,
+    this.community,
+    this.schoolName,
+    this.course,
+    this.major,
+    this.college,
+    this.year,
+    this.currentYear,
+    this.mode,
+    this.schoolName10th,
+    this.schoolName12th,
+    this.bankName,
+    this.bankAccountNumber,
+    this.bankIfsc,
+    this.fundingPercentage,
+    this.amountApprox,
+    this.fatherName,
+    this.fatherContactNumber,
+    this.fatherOccupation,
+    this.motherName,
+    this.motherContactNumber,
+    this.motherOccupation,
+    this.guardianName,
+    this.guardianContactNumber,
+    this.guardianOccupation,
   });
 }
 
@@ -82,23 +160,163 @@ final ValueNotifier<int> globalPendingRequestsCount = ValueNotifier(3);
 enum RequestType { leave, fee, achievement }
 enum RequestStatus { pending, accepted, rejected }
 
-class StudentRequest {
-  final String id;
-  final String studentName;
-  final String studentId;
-  final RequestType type;
-  final String description;
-  final DateTime date;
-  RequestStatus status;
+abstract class StudentRequest {
+  String get id;
+  String get studentName;
+  String get studentId;
+  RequestType get type;
+  String get description;
+  DateTime get date;
+  RequestStatus get status;
+  set status(RequestStatus value);
+}
 
-  StudentRequest({
-    required this.id,
-    required this.studentName,
+class LeaveRequestModel implements StudentRequest {
+  final String leaveRequestId;
+  @override final String studentId;
+  @override final String studentName;
+  final String requestedBy;
+  final String reason;
+  final DateTime leaveDate;
+  final DateTime resumeDate;
+  @override RequestStatus status;
+  final String? reviewedBy;
+  final String? reviewNote;
+  final DateTime? reviewedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  LeaveRequestModel({
+    required this.leaveRequestId,
     required this.studentId,
-    required this.type,
-    required this.description,
-    required this.date,
+    required this.studentName,
+    required this.requestedBy,
+    required this.reason,
+    required this.leaveDate,
+    required this.resumeDate,
     this.status = RequestStatus.pending,
+    this.reviewedBy,
+    this.reviewNote,
+    this.reviewedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  @override String get id => leaveRequestId;
+  @override RequestType get type => RequestType.leave;
+  @override String get description => reason;
+  @override DateTime get date => createdAt;
+}
+
+class FeeRequestModel implements StudentRequest {
+  final String feeRequestId;
+  @override final String studentId;
+  @override final String studentName;
+  final String requestedBy;
+  final double amount;
+  final String reason;
+  @override RequestStatus status;
+  final String feeType;
+  final String email;
+  final int submittedMarksheets;
+  final int submittedPaymentReceipts;
+  final String driveLink;
+  final String studentHope3Id;
+  final String course;
+  final DateTime dueDate;
+  final String contactNumber;
+  final String paymentMode;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? reviewedBy;
+  final String? reviewNote;
+  final DateTime? reviewedAt;
+
+  FeeRequestModel({
+    required this.feeRequestId,
+    required this.studentId,
+    required this.studentName,
+    required this.requestedBy,
+    required this.amount,
+    required this.reason,
+    this.status = RequestStatus.pending,
+    required this.feeType,
+    required this.email,
+    required this.submittedMarksheets,
+    required this.submittedPaymentReceipts,
+    required this.driveLink,
+    required this.studentHope3Id,
+    required this.course,
+    required this.dueDate,
+    required this.contactNumber,
+    required this.paymentMode,
+    required this.createdAt,
+    required this.updatedAt,
+    this.reviewedBy,
+    this.reviewNote,
+    this.reviewedAt,
+  });
+
+  @override String get id => feeRequestId;
+  @override RequestType get type => RequestType.fee;
+  @override String get description => reason;
+  @override DateTime get date => createdAt;
+}
+
+class StudentAchievementModel implements StudentRequest {
+  final String achievementId;
+  @override final String studentId;
+  @override final String studentName;
+  final String achievementType;
+  final String title;
+  @override RequestStatus status;
+  final DateTime submittedAt;
+  final String achievementDescription;
+  final String photoDriveLink;
+  final String? reviewedBy;
+  final String? reviewNote;
+  final DateTime? reviewedAt;
+  final DateTime updatedAt;
+
+  StudentAchievementModel({
+    required this.achievementId,
+    required this.studentId,
+    required this.studentName,
+    required this.achievementType,
+    required this.title,
+    this.status = RequestStatus.pending,
+    required this.submittedAt,
+    required this.achievementDescription,
+    required this.photoDriveLink,
+    this.reviewedBy,
+    this.reviewNote,
+    this.reviewedAt,
+    required this.updatedAt,
+  });
+
+  @override String get id => achievementId;
+  @override RequestType get type => RequestType.achievement;
+  @override String get description => achievementDescription;
+  @override DateTime get date => submittedAt;
+}
+
+class MessageModel {
+  final String messageId;
+  final String studentId;
+  final String senderId;
+  final String message;
+  final bool isRead;
+  final DateTime sentAt;
+  final DateTime updatedAt;
+
+  MessageModel({
+    required this.messageId,
+    required this.studentId,
+    required this.senderId,
+    required this.message,
+    required this.isRead,
+    required this.sentAt,
+    required this.updatedAt,
   });
 }
 
@@ -173,22 +391,28 @@ class ExpenseRecord {
 
 // --- PARENT MODELS ---
 class ParentProfile {
-  final String id;
-  final String name;
-  final String contactNumber;
-  final String email;
-  final String address;
-  final List<String> studentIds; 
-  final List<String> activityHistory; 
+  final String parentId;
+  final String userId;
+  final String studentId;
+  final String parentName;
+  final String parentPhone;
+  final String relation;
+  final int isPrimary;
+  final String? fcmToken;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   const ParentProfile({
-    required this.id,
-    required this.name,
-    required this.contactNumber,
-    required this.email,
-    required this.address,
-    required this.studentIds,
-    this.activityHistory = const [],
+    required this.parentId,
+    required this.userId,
+    required this.studentId,
+    required this.parentName,
+    required this.parentPhone,
+    required this.relation,
+    required this.isPrimary,
+    this.fcmToken,
+    required this.createdAt,
+    required this.updatedAt,
   });
 }
 
@@ -226,5 +450,34 @@ class DonorProfile {
     this.studentIds = const [],
     this.donationHistory = const [],
     this.notes = '',
+  });
+}
+
+// --- HEALTH MODELS ---
+class StudentHealthModel {
+  final String healthReportId;
+  final String studentId;
+  final DateTime reportDate;
+  final double heightCm;
+  final double weightKg;
+  final String healthStatus;
+  final String medicine;
+  final String doctorVisit;
+  final String recordedBy;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  StudentHealthModel({
+    required this.healthReportId,
+    required this.studentId,
+    required this.reportDate,
+    required this.heightCm,
+    required this.weightKg,
+    required this.healthStatus,
+    required this.medicine,
+    required this.doctorVisit,
+    required this.recordedBy,
+    required this.createdAt,
+    required this.updatedAt,
   });
 }

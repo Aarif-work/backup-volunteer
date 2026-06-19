@@ -15,60 +15,32 @@ class _ParentListScreenState extends State<ParentListScreen> {
   
   final List<ParentProfile> _allParents = [
     ParentProfile(
-      id: 'p1',
-      name: 'Michael Smith',
-      contactNumber: '+1 555-0101',
-      email: 'michael.smith@example.com',
-      address: '123 Main St, Springfield',
-      studentIds: ['s1', 's2'],
-      activityHistory: ['Attended PTA meeting', 'Called regarding leave'],
+      parentId: 'eedb48f8-4645-4ee4-aae2-7c28c896b062',
+      userId: 'c7b4dc02-b9a2-40db-b396-9ccb375a6879',
+      studentId: 'STU001',
+      parentName: 'Test Parent',
+      parentPhone: '9876543210',
+      relation: 'father',
+      isPrimary: 1,
+      createdAt: DateTime.parse('2026-06-13T10:25:23'),
+      updatedAt: DateTime.parse('2026-06-15T12:02:06'),
     ),
     ParentProfile(
-      id: 'p2',
-      name: 'Sarah Johnson',
-      contactNumber: '+1 555-0102',
-      email: 'sarah.j@example.com',
-      address: '456 Oak Ave, Springfield',
-      studentIds: ['s3'],
-      activityHistory: ['Submitted fee receipt'],
-    ),
-    ParentProfile(
-      id: 'p3',
-      name: 'David Brown',
-      contactNumber: '+1 555-0103',
-      email: 'david.b@example.com',
-      address: '789 Pine Rd, Springfield',
-      studentIds: ['s4'],
-      activityHistory: [],
-    ),
-    ParentProfile(
-      id: 'p4',
-      name: 'Emily Davis',
-      contactNumber: '+1 555-0104',
-      email: 'emily.davis@example.com',
-      address: '321 Maple St, Springfield',
-      studentIds: ['s5', 's6'],
-      activityHistory: ['Requested medical leave'],
-    ),
-    ParentProfile(
-      id: 'p5',
-      name: 'James Wilson',
-      contactNumber: '+1 555-0105',
-      email: 'james.wilson@example.com',
-      address: '654 Elm St, Springfield',
-      studentIds: ['s7'],
-      activityHistory: ['Attended annual day'],
+      parentId: 'p2',
+      userId: 'u2',
+      studentId: 'STU042',
+      parentName: 'Sarah Johnson',
+      parentPhone: '555-0102',
+      relation: 'mother',
+      isPrimary: 1,
+      createdAt: DateTime.parse('2026-05-10T10:00:00'),
+      updatedAt: DateTime.parse('2026-06-10T10:00:00'),
     ),
   ];
 
   String _getStudentName(String id) {
-    if (id == 's1') return 'Alice Smith';
-    if (id == 's2') return 'Bob Smith';
-    if (id == 's3') return 'Charlie Johnson';
-    if (id == 's4') return 'Diana Brown';
-    if (id == 's5') return 'Ethan Davis';
-    if (id == 's6') return 'Fiona Davis';
-    if (id == 's7') return 'George Wilson';
+    if (id == 'STU001') return 'Rahul Kumar';
+    if (id == 'STU042') return 'Sneha Singh';
     return 'Unknown Student';
   }
 
@@ -84,8 +56,8 @@ class _ParentListScreenState extends State<ParentListScreen> {
     setState(() {
       _filteredParents = _allParents
           .where((parent) =>
-              parent.name.toLowerCase().contains(value.toLowerCase()) ||
-              parent.contactNumber.contains(value))
+              parent.parentName.toLowerCase().contains(value.toLowerCase()) ||
+              parent.parentPhone.contains(value))
           .toList();
     });
   }
@@ -188,13 +160,13 @@ class _ParentListScreenState extends State<ParentListScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(parent.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
+                      Text(parent.parentName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryText)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
                           const Icon(Icons.phone_rounded, size: 14, color: AppTheme.secondaryText),
                           const SizedBox(width: 4),
-                          Text(parent.contactNumber, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
+                          Text(parent.parentPhone, style: const TextStyle(color: AppTheme.secondaryText, fontSize: 13)),
                         ],
                       ),
                     ],
@@ -207,46 +179,33 @@ class _ParentListScreenState extends State<ParentListScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${parent.studentIds.length} Student${parent.studentIds.length > 1 ? 's' : ''}',
+                    parent.relation.toUpperCase(),
                     style: const TextStyle(color: AppTheme.mintAccent, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
-            if (parent.studentIds.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              const Divider(color: Color(0xFFEEEEEE)),
-              const SizedBox(height: 12),
-              const Text('LINKED STUDENTS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.0)),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 36,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: parent.studentIds.length,
-                  itemBuilder: (context, idx) {
-                    final sId = parent.studentIds[idx];
-                    return Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4, left: 4),
-                      decoration: BoxDecoration(
-                        color: AppTheme.backgroundColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircleAvatar(radius: 14, backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=$sId')),
-                          const SizedBox(width: 8),
-                          Text(_getStudentName(sId), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+            const SizedBox(height: 16),
+            const Divider(color: Color(0xFFEEEEEE)),
+            const SizedBox(height: 12),
+            const Text('LINKED STUDENT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.secondaryText, letterSpacing: 1.0)),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.only(right: 12, top: 4, bottom: 4, left: 4),
+              decoration: BoxDecoration(
+                color: AppTheme.backgroundColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.grey.shade200),
               ),
-            ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(radius: 14, backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=${parent.studentId}')),
+                  const SizedBox(width: 8),
+                  Text(_getStudentName(parent.studentId), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryText)),
+                ],
+              ),
+            ),
           ],
         ),
       ),
