@@ -155,29 +155,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppTheme.backgroundColor,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1.5),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<UserRole>(
-                            value: _selectedRole,
-                            isExpanded: true,
-                            icon: const Padding(
-                              padding: EdgeInsets.only(right: 16.0),
-                              child: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.secondaryText),
-                            ),
-                            items: const [
-                              DropdownMenuItem(value: UserRole.superAdmin, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Super Admin', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
-                              DropdownMenuItem(value: UserRole.admin, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Admin', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
-                              DropdownMenuItem(value: UserRole.finance, child: Padding(padding: EdgeInsets.only(left: 16.0), child: Text('Finance', style: TextStyle(color: AppTheme.primaryText, fontSize: 15, fontWeight: FontWeight.w500)))),
-                            ],
-                            onChanged: (val) {
-                              if (val != null) setState(() => _selectedRole = val);
-                            },
-                          ),
+                      SizedBox(
+                        height: 55,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            _buildRoleChip('Super Admin', UserRole.superAdmin),
+                            _buildRoleChip('Admin', UserRole.admin),
+                            _buildRoleChip('Finance', UserRole.finance),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -283,6 +269,38 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRoleChip(String label, UserRole role) {
+    final isSelected = _selectedRole == role;
+    return GestureDetector(
+      onTap: () {
+        if (!isSelected) setState(() => _selectedRole = role);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
+          boxShadow: isSelected 
+            ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))] 
+            : [],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

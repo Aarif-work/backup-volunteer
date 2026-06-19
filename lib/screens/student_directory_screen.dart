@@ -23,14 +23,14 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
   }
 
   final List<StudentProfile> _students = const [
-    StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'Primary', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
-    StudentProfile(id: 'STU042', name: 'Sneha Singh', rollNumber: '2024-A-42', className: 'High', photoUrl: '', feeHistory: ['Term 1 - Paid', 'Term 2 - Pending']),
-    StudentProfile(id: 'STU088', name: 'Priya Sharma', rollNumber: '2024-B-12', className: 'Primary', photoUrl: ''),
-    StudentProfile(id: 'STU099', name: 'Arjun Das', rollNumber: '2024-C-05', className: 'Middle', photoUrl: '', achievements: ['Debate Team Lead']),
-    StudentProfile(id: 'STU105', name: 'Vikram Singh', rollNumber: '2024-C-10', className: 'Middle', photoUrl: '', feeHistory: ['Term 1 - Paid']),
-    StudentProfile(id: 'STU112', name: 'Ananya Patel', rollNumber: '2024-D-22', className: 'High', photoUrl: '', achievements: ['Math Olympiad Medalist']),
-    StudentProfile(id: 'STU133', name: 'Neha Gupta', rollNumber: '2024-A-15', className: 'Primary', photoUrl: ''),
-    StudentProfile(id: 'STU145', name: 'Karan Malhotra', rollNumber: '2024-B-08', className: 'High', photoUrl: ''),
+    StudentProfile(id: 'STU001', name: 'Rahul Kumar', rollNumber: '2024-A-01', className: 'RCD 1', photoUrl: '', achievements: ['Science Fair 1st Place', 'Perfect Attendance Dec'], leaveHistory: ['24/04/2024 - 26/04/2024 (Medical)']),
+    StudentProfile(id: 'STU042', name: 'Sneha Singh', rollNumber: '2024-A-42', className: 'RCD 2', photoUrl: '', feeHistory: ['Term 1 - Paid', 'Term 2 - Pending']),
+    StudentProfile(id: 'STU088', name: 'Priya Sharma', rollNumber: '2024-B-12', className: 'RCD 1', photoUrl: ''),
+    StudentProfile(id: 'STU099', name: 'Arjun Das', rollNumber: '2024-C-05', className: 'RCD 3', photoUrl: '', achievements: ['Debate Team Lead']),
+    StudentProfile(id: 'STU105', name: 'Vikram Singh', rollNumber: '2024-C-10', className: 'RCD 3', photoUrl: '', feeHistory: ['Term 1 - Paid']),
+    StudentProfile(id: 'STU112', name: 'Ananya Patel', rollNumber: '2024-D-22', className: 'RCD 2', photoUrl: '', achievements: ['Math Olympiad Medalist']),
+    StudentProfile(id: 'STU133', name: 'Neha Gupta', rollNumber: '2024-A-15', className: 'RCD 1', photoUrl: ''),
+    StudentProfile(id: 'STU145', name: 'Karan Malhotra', rollNumber: '2024-B-08', className: 'RCD 2', photoUrl: ''),
   ];
 
   @override
@@ -202,29 +202,42 @@ class _StudentDirectoryScreenState extends State<StudentDirectoryScreen> {
   }
 
   Widget _buildFilterRow() {
-    final filters = ['All', 'Primary', 'Middle', 'High'];
+    final filters = ['All', 'RCD 1', 'RCD 2', 'RCD 3'];
     return SizedBox(
-      height: 55,
+      height: 60,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         itemCount: filters.length,
         itemBuilder: (context, index) {
           final filter = filters[index];
           final isSelected = filter == _selectedFilter;
-          return Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: ChoiceChip(
-              label: Text(filter),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) setState(() => _selectedFilter = filter);
-              },
-              selectedColor: Colors.black,
-              labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black, fontWeight: FontWeight.bold),
-              backgroundColor: Colors.grey.shade100,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              side: BorderSide.none,
+          return GestureDetector(
+            onTap: () {
+              if (!isSelected) setState(() => _selectedFilter = filter);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.black : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: isSelected ? Colors.black : Colors.grey.shade300, width: 1.5),
+                boxShadow: isSelected 
+                  ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 8, offset: const Offset(0, 4))] 
+                  : [],
+              ),
+              child: Center(
+                child: Text(
+                  filter,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
             ),
           );
         },
